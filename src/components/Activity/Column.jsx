@@ -97,24 +97,25 @@ export default function Column({
   const [editIndex, setEditIndex] = useState(-1);
   const [open, setOpen] = useState(false);
   const [taskmembers, setTaskmembers] = useState([]);
-
+  const [singletaskmembers, setSingletaskmembers] = useState([]);
   //confirmation
   const [taskToDelete, setTaskToDelete] = useState(null); // New state for task to delete
   const [confirmationOpen, setConfirmationOpen] = useState(false);
 
   const api = useAxios();
+  useEffect(() => {
+    if (incomingTasks) {
+      // Assign incoming tasks to the tasks state immediately
+      setTasks(incomingTasks);
+    }
+  }, [incomingTasks]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const taskmemberresponse = await api.get("/taskmembers/");
+
         setTaskmembers(taskmemberresponse.data);
-        console.log(
-          " $$$$$$4 All task Memebers Data are " +
-            taskmemberresponse.data.length
-        );
-        // const tasksResponse = await api.get("/tasklist/");
-        // setTasks(tasksResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -123,12 +124,6 @@ export default function Column({
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (incomingTasks) {
-      // Assign incoming tasks to the tasks state immediately
-      setTasks(incomingTasks);
-    }
-  }, [incomingTasks]);
   const removeTodo = (taskId) => {
     openConfirmationDialog(taskId); // Open confirmation dialog
   };
@@ -184,9 +179,14 @@ export default function Column({
     setEditIndex(index);
   };
 
-  const handleOpen = (selectedtask, index) => {
+  const handleOpen = (selectedtask, taskmembers, index) => {
     setSelectedTask(selectedtask);
 
+    const taskMemberslist = taskmembers.filter(
+      (member) => member.task_id === selectedtask.id
+    );
+    setSingletaskmembers(taskMemberslist);
+    console.log("%%%%%% After mattters ", singletaskmembers);
     setOpen(true);
   };
 
@@ -265,6 +265,7 @@ export default function Column({
             open={open}
             selectedTask={selectedTask}
             allusers={allusers}
+            assignedtaskmembers={singletaskmembers}
             handleClose={handleClose}
             handleTaskUpdate={handleTaskUpdate}
           />
@@ -324,115 +325,127 @@ export default function Column({
             {...provided.droppableProps}
             isDraggingOver={snapshot.isDraggingOver}
           >
-            {tasks.map((task, index) => (
-              <Draggable draggableId={`${task.id}`} key={task.id} index={index}>
-                {(provided, snapshot) => (
-                  <ContainerCard
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    ref={provided.innerRef}
-                    isDragging={snapshot.isDragging}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        backgroundColor: task.cover == null ? "" : task.cover,
-                        justifyContent: "space-between", // Aligns items with space between them
-                        padding: 2,
-                      }}
+            {tasks.map((task, index) => {
+              return (
+                <Draggable
+                  draggableId={`${task.id}`}
+                  key={task.id}
+                  index={index}
+                >
+                  {(provided, snapshot) => (
+                    <ContainerCard
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      ref={provided.innerRef}
+                      isDragging={snapshot.isDragging}
                     >
-                      <span>
-                        <small>
-                          #{task.id}cover is {task.cover}
-                        </small>{" "}
-                        {/* First small element */}
-                      </span>
-                      <span>
-                        <small>
-                          <div className="card-tools">
-                            <button
-                              onClick={() => startEdit(index)}
-                              className="btn btn-tool "
-                            >
-                              <i className="fas fa-pen" />
-                            </button>
-                            <button
-                              onClick={() => removeTodo(task.id)}
-                              className="btn btn-tool"
-                            >
-                              <i className="fas fa-trash" />
-                            </button>
-                          </div>
-                        </small>{" "}
-                        {/* Second small element */}
-                      </span>
-                    </div>
-
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        padding: 2,
-                      }}
-                    >
-                      <TextContent>{task.task_name}</TextContent>
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between", // Aligns items with space between them
-                        padding: 2,
-                      }}
-                    >
-                      <span style={{ display: "flex", alignItems: "center" }}>
-                        <small>{getLocacDate(task.due_date)}</small>
-                        {/* Add space between the two small elements */}
-                        <div style={{ width: 10 }} />
-                        <small>{getPriority(task.status)}</small>
-                      </span>
-
-                      <span style={{ display: "flex", alignItems: "center" }}>
-                        <small>
-                          <div className="card-tools">
-                            <div style={{ display: "flex", gap: "8px" }}>
-                              {taskmembers
-                                .filter((taskm) => taskm.task.id === task.id)
-                                .map((taskMember) => (
-                                  <Avatar
-                                    key={taskMember.id} // Don't forget to add a unique key for each avatar
-                                    onClick={() => console.log(task)}
-                                    src={
-                                      "https://joesch.moe/api/v1/random?key=" +
-                                      taskMember.id
-                                    }
-                                    style={{ cursor: "pointer" }} // Add cursor pointer for better UX
-                                  />
-                                ))}
+                      <div
+                        style={{
+                          display: "flex",
+                          backgroundColor: task.cover == null ? "" : task.cover,
+                          justifyContent: "space-between", // Aligns items with space between them
+                          padding: 2,
+                        }}
+                      >
+                        <span>
+                          <small>
+                            #{task.id}
+                          </small>{" "}
+                          {/* First small element */}
+                        </span>
+                        <span>
+                          <small>
+                            <div className="card-tools">
+                              <button
+                                onClick={() => startEdit(index)}
+                                className="btn btn-tool "
+                              >
+                                <i className="fas fa-pen" />
+                              </button>
+                              <button
+                                onClick={() => removeTodo(task.id)}
+                                className="btn btn-tool"
+                              >
+                                <i className="fas fa-trash" />
+                              </button>
                             </div>
+                          </small>{" "}
+                          {/* Second small element */}
+                        </span>
+                      </div>
 
-                            <button
-                              onClick={() => handleOpen(task)}
-                              className="btn btn-tool"
-                            >
-                              <i className="fas fa-pen" />
-                            </button>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: 2,
+                        }}
+                      >
+                        <TextContent>{task.task_name}</TextContent>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between", // Aligns items with space between them
+                          padding: 2,
+                        }}
+                      >
+                        <span style={{ display: "flex", alignItems: "center" }}>
+                          <small>{getLocacDate(task.due_date)}</small>
+                          {/* Add space between the two small elements */}
+                          <div style={{ width: 10 }} />
+                          <small>{getPriority(task.status)}</small>
+                        </span>
 
-                            <button
-                              onClick={() => getDetails(task.id)}
-                              className="btn btn-tool"
-                            >
-                              <i className="fas fa-book" />
-                            </button>
-                          </div>
-                        </small>
-                      </span>
-                    </div>
+                        <span style={{ display: "flex", alignItems: "center" }}>
+                          <small>
+                            <div className="card-tools">
+                              <div style={{ display: "flex", gap: "8px" }}>
+                                {taskmembers &&
+                                  taskmembers.length > 0 &&
+                                  taskmembers
+                                    .filter(
+                                      (taskm) => taskm.task_id === task.id
+                                    )
+                                    .map((taskMember) => (
+                                      <Avatar
+                                        key={taskMember.id} // Don't forget to add a unique key for each avatar
+                                        onClick={() => console.log(task)}
+                                        src={
+                                          "https://joesch.moe/api/v1/random?key=" +
+                                          taskMember.assigned_to_id
+                                        }
+                                        
+                                        style={{ cursor: "pointer" }} // Add cursor pointer for better UX
+                                      />
+                                    ))}
+                                {/*  */}
+                              </div>
 
-                    {provided.placeholder}
-                  </ContainerCard>
-                )}
-              </Draggable>
-            ))}
+                              <button
+                                onClick={() => handleOpen(task, taskmembers)}
+                                className="btn btn-tool"
+                              >
+                                <i className="fas fa-pen" />
+                              </button>
+
+                              <button
+                                onClick={() => getDetails(task.id)}
+                                className="btn btn-tool"
+                              >
+                                <i className="fas fa-book" />
+                              </button>
+                            </div>
+                          </small>
+                        </span>
+                      </div>
+
+                      {provided.placeholder}
+                    </ContainerCard>
+                  )}
+                </Draggable>
+              );
+            })}
             {provided.placeholder}
           </TaskList>
         )}

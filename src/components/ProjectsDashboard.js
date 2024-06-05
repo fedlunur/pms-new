@@ -1,33 +1,25 @@
 import React, { useState, useEffect } from "react";
 import useAxios from "../utils/useAxios";
 import Layout from "../views/Layout";
-import ActivityList from "../views/ActivityList";
+
 import { useLocation } from "react-router-dom";
 import ProjectCard from "./ProjectCard";
 import DatatableProjects from "./DatatableProjects";
+import DataService from "./DataServices"; 
 
 export default function ProjectsDashboard() {
   const api = useAxios();
+  const [taskmembers, setTaskmembers] = useState([]);
   const [incomingprojects, setIncomingprojects] = useState([]);
+  const [incomingactivities, setIncomingactivities] = useState([]);
   const [incomingTeammebers, setIncomingTeammebers] = useState([]);
   const [incomingusers, setIncomingUsers] = useState([]);
-  const location = useLocation();
-  const projects =
-    location.state && location.state.projects
-      ? location.state.projects
-      : incomingprojects;
-  const teammebers = location.state && location.state.teammebers;
-  const users = location.state && location.state.users;
-  const activities = location.state && location.state.activities;
+  const [tasks, setTasks] = useState([]);
+  const [user, setUsers] = useState([]);
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-  const fetchProjects = async () => {
-    const response = await api.get("/project/");
-    setIncomingprojects(response.data);
-    console.log("Incoming data Error ");
-  };
+
+  const location = useLocation();
+  const { allprojects,allactivities,alltasks,alluserss,alltaskmembers,allteammembers, loading, error, activities_by_project, tasksbyproject } = DataService(); // Assuming useCrud fetches data
 
   return (
     <Layout>
@@ -39,26 +31,34 @@ export default function ProjectsDashboard() {
             <div className="container-fluid">
               {/* Small boxes (Stat box) */}
               <div className="row">
-                {projects.map((Project) => (
+                {allprojects.map((Project,index) => (
                   <ProjectCard
-                    key={Project.id}
-                    title={Project.project_name}
-                    content={Project.description}
+                     key={Project.id}
+                    project={Project}
+                    index={index}
+                    users={alluserss}
+                    teammebers={allteammembers}
+                    activities={allactivities}
                   />
                 ))}
               </div>
-            </div>
-          </section>
+       
+       
           <DatatableProjects
-            projects={projects}
-            teammembers={teammebers}
-            users={users}
-            activities={activities}
+            projects={allprojects}
+            teammembers={allteammembers}
+            users={alluserss}
+            activities={allactivities}
+            tasks={alltasks}
           />
+               </div>
+             </section>
           {/* 
 /* new data table      */}
         </div>
       </div>
+   
     </Layout>
+
   );
 }

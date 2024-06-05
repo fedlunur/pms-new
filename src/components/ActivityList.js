@@ -22,8 +22,7 @@ function ActivityList({ activity }) {
 
     fetchTasksByActivityID();
   }, []);
-  console.log("Activity:", activity);
-  console.log("Tasks in ActivityList:", tasks);
+
   return (
     <div className="activity">
       <h2>{activity.name}</h2>

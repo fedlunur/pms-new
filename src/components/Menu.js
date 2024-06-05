@@ -52,14 +52,7 @@ export default function Menu() {
                     <i className="right fas fa-angle-left" />
                   </p>
                 </Link>
-                <ul className="nav nav-treeview">
-                  <li className="nav-item">
-                    <a href="./index.html" className="nav-link active">
-                      <i className="far fa-circle nav-icon" />
-                      <p>Dashboard </p>
-                    </a>
-                  </li>
-                </ul>
+            
               </li>
 
               <li className="nav-item">
@@ -74,29 +67,41 @@ export default function Menu() {
 
               <li className="nav-header">Tasks</li>
               <li className="nav-item">
-                <a href="pages/calendar.html" className="nav-link">
-                  <i className="nav-icon far fa-calendar-alt" />
-                  <p>Calendar</p>
-                </a>
-                <a href="pages/calendar.html" className="nav-link">
-                  <i className="nav-icon far fa-calendar-alt" />
-                  <p>Assigned tasks</p>
-                </a>
+                <Link to="/timetable" className="nav-link">
+                  <i className="nav-icon far fa-calendar-alt " />
+                  <p>
+                    Events
+                    <i className="right fas fa-angle-left" />
+                  </p>
+                </Link>
+                <Link to="/taskdt" className="nav-link">
+                  <i className="nav-icon fas fa-chart-pie" />
+                  <p>
+                    Tasks
+                    <i className="right fas fa-calendar-alt " />
+                  </p>
+                </Link>
               </li>
               <li className="nav-header">Teams</li>
               <li className="nav-item">
-                <a href="pages/calendar.html" className="nav-link">
-                  <i className="nav-icon far fa-calendar-alt" />
+                <Link to="/membersandchat" className="nav-link">
+                  <i className="nav-icon far fa-person-alt" />
                   <p>Members</p>
-                </a>
+                </Link>
               </li>
-              <Link to="/activityboardlist" className="nav-link active">
-                <i className="nav-icon fas fa-tachometer-alt" />
-                <p>
-                  ActivityDash Board
-                  <i className="right fas fa-angle-left" />
-                </p>
-              </Link>
+              <li className="nav-item">
+                <Link to="/attachments" className="nav-link">
+                  <i className="nav-icon far fa-person-alt" />
+                  <p>Attachments</p>
+                </Link>
+                <Link to="/charts" className="nav-link">
+                  <i className="nav-icon far fa-person-alt" />
+                  <p>Charts</p>
+                </Link>
+                
+              </li>
+
+              
             </ul>
           </nav>
           {/* /.sidebar-menu */}

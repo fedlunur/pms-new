@@ -1,90 +1,113 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
-import TextField from "@mui/material/TextField";
-import IconButton from "@mui/material/IconButton";
-import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import useAxios from "../../utils/useAxios";
+import axios from "axios"; // Import Axios
 
-export default function ActivityList() {
-  const [activities, setActivities] = useState([
-    { id: 0, text: "Activity 1", completed: false },
-    { id: 1, text: "Activity 2", completed: false },
-    { id: 2, text: "Activity 3", completed: false },
-    { id: 3, text: "Activity 4", completed: false },
-  ]);
-  const [newActivity, setNewActivity] = useState("");
+function Checklist({ task }) {
+  const [items, setItems] = useState([]);
+  const [newItem, setNewItem] = useState("");
+  const api = useAxios(); // Correctly defining the api variable here
 
-  const handleToggle = (activityId) => () => {
-    setActivities((prevActivities) =>
-      prevActivities.map((activity) =>
-        activity.id === activityId
-          ? { ...activity, completed: !activity.completed }
-          : activity
-      )
-    );
-  };
+  useEffect(() => {
+    const fetchChecklistItems = async () => {
+      try {
+        const response = await api.get(`/taskchecklist/?task=${task.id}`);
+        console.log("The data based hgads asdd ====> " + response.data.length);
+        setItems(response.data);
+      } catch (error) {
+        console.error("Error fetching checklist items:", error);
+      }
+    };
 
-  const handleAddActivity = () => {
-    if (newActivity.trim() !== "") {
-      setActivities([
-        ...activities,
-        { id: activities.length, text: newActivity, completed: false },
-      ]);
-      setNewActivity("");
+    fetchChecklistItems();
+  }, []);
+  const handleAddItem = async () => {
+    if (newItem.trim() === "") return;
+    try {
+      const response = await api.post("/taskchecklist/", {
+        name: newItem,
+        task: task.id,
+      });
+      const newItemData = response.data;
+      setItems([...items, newItemData]);
+      setNewItem("");
+    } catch (error) {
+      console.error("Error adding item:", error);
     }
   };
 
-  const handleDeleteActivity = (activityId) => () => {
-    setActivities(activities.filter((activity) => activity.id !== activityId));
+  const handleToggle = (itemId) => async () => {
+    try {
+      const updatedItems = items.map((item) =>
+        item.id === itemId ? { ...item, status: !item.status } : item
+      );
+      setItems(updatedItems);
+      await api.patch(`/taskchecklist/${itemId}/`, {
+        status: updatedItems.find((item) => item.id === itemId).status,
+      });
+    } catch (error) {
+      console.error("Error updating item:", error);
+    }
+  };
+  const [loading, setLoading] = useState(false);
+
+  const handleDeleteItem = (Incomingitem) => async () => {
+    try {
+      await api.delete(`/taskchecklist/${Incomingitem.id}/`);
+      const updatedTasks = items.filter((item) => item.id !== Incomingitem.id);
+      setItems(updatedTasks);
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
   };
 
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center" }}>
         <TextField
-          label="Add Activity"
-          value={newActivity}
-          onChange={(e) => setNewActivity(e.target.value)}
+          label="Add Item"
+          value={newItem}
+          onChange={(e) => setNewItem(e.target.value)}
           fullWidth
           sx={{ marginBottom: 1 }}
         />
-        <IconButton onClick={handleAddActivity} color="primary">
+        <IconButton onClick={handleAddItem} color="primary">
           <AddIcon />
         </IconButton>
       </div>
       <List sx={{ width: "100%", maxWidth: 360 }}>
-        {activities.map((activity) => (
-          <ListItem key={activity.id} disablePadding divider>
+        {items.map((item) => (
+          <ListItem key={item.id} disablePadding divider>
             <ListItemButton dense>
               <ListItemIcon sx={{ minWidth: "auto" }}>
                 <Checkbox
                   edge="start"
-                  checked={activity.completed}
+                  checked={item.status}
                   disableRipple
                   sx={{ padding: 0.5 }}
-                  onClick={handleToggle(activity.id)}
+                  onClick={handleToggle(item.id)}
                 />
               </ListItemIcon>
               <ListItemText
-                primary={activity.text}
+                primary={item.name}
                 sx={{
-                  flex: "0 0 auto",
+                  flex: "1 1 auto",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  textDecoration: activity.completed ? "line-through" : "none",
+                  textDecoration: item.status ? "line-through" : "none",
                 }}
               />
-              <IconButton
-                onClick={handleDeleteActivity(activity.id)}
-                color="secondary"
-                sx={{ marginLeft: "auto" }}
-              >
+              <IconButton onClick={handleDeleteItem(item)} color="secondary">
                 <DeleteIcon />
               </IconButton>
             </ListItemButton>
@@ -94,3 +117,5 @@ export default function ActivityList() {
     </div>
   );
 }
+
+export default Checklist;

@@ -12,7 +12,9 @@ function Layout({ children }) {
     <div>
       <Header />
       <Menu />
+
       <div>{children}</div>
+
       <Footer />
       <AppSetting />
     </div>

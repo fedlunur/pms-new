@@ -1,0 +1,86 @@
+/* FullCalendar Header */
+.fc-toolbar {
+  color: white;
+  font-size: 14px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px !important;
+  background: #17405d;
+}
+.fc-event,
+.fc-background-event {
+  z-index: 2;
+  background-color: #17405d;
+  color: white;
+  padding: 0px !important;
+  border: none !important;
+}
+
+.fc-event-label {
+  display: none !important;
+}
+.fc .fc-daygrid-day {
+  border: 1px solid #e0e0e0;
+}
+
+.fc .fc-timegrid-slot {
+  border: 1px solid #e0e0e0;
+}
+
+
+/* FullCalendar Events */
+/* .fc .fc-event {
+  background-color: #17405d; /* Adjust color as needed */
+  /* color: white;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+}
+
+
+/* FullCalendar Today Highlight */
+.fc .fc-daygrid-day.fc-day-today {
+    background-color: #cbd1fb !important;
+
+}
+
+/* FullCalendar Selected Date */
+.fc .fc-highlight {
+  background-color: #f0f0f0;
+}
+
+/* FullCalendar All-Day Cell */
+.fc .fc-daygrid-allday {
+  display: none;
+}
+
+/* Custom Event Tooltip */
+.fc .popoverStyle .popover {
+  max-width: 200px;
+  background-color: #333;
+  color: white;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 14px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+/* FullCalendar Events - Remove Hover Effects */
+
+.fc-list-event:hover {
+  background-color:  white !important; /* Ensure background doesn't change */
+  color: inherit !important; /* Ensure text color doesn't change */
+}

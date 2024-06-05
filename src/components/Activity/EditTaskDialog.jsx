@@ -7,30 +7,43 @@ import DialogActions from "@material-ui/core/DialogActions";
 import CustomMultiselect from "./MultiSelect";
 import { ChromePicker } from "react-color";
 import useAxios from "../../utils/useAxios";
-import InfiniteCalendar from "react-infinite-calendar";
-import "react-infinite-calendar/styles.css";
-import CheckboxList from "./Checklist";
+// import InfiniteCalendar from "react-infinite-calendar";
+// import "react-infinite-calendar/styles.css";
 
+// import 'react-calendar/dist/Calendar.css';
+// import Calendar from 'react-calendar';
+import Checklist from "./Checklist";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import { Calendar } from 'primereact/calendar';
 function MyFormDialog({
   open,
   selectedTask,
   allusers,
-
+  assignedtaskmembers,
   handleClose,
   handleTaskUpdate,
 }) {
+ 
+
   const api = useAxios();
   const [startDate, setStartDate] = useState();
 
-  const [selectedValues, setSelectedValues] = useState();
+  const [selectedValues, setSelectedValues] = useState([]);
   const [cover, setCover] = useState();
-
+  const [assignedmember, setAssignedMember] = useState([]);
   const [formData, setFormData] = useState({
     task_name: selectedTask ? selectedTask.task_name : "",
     status: selectedTask ? selectedTask.status : "",
     due_date: selectedTask ? selectedTask.due_date : null,
     cover: selectedTask ? selectedTask.cover : null,
   });
+
+  // task check list
+
+  // Usage
+
   const handleChangeColor = (newColor) => {
     setCover(newColor.hex);
   };
@@ -43,18 +56,18 @@ function MyFormDialog({
 
   useEffect(() => {
     if (selectedTask) {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
+      setFormData({
         task_name: selectedTask.task_name,
         status: selectedTask.status,
         cover: selectedTask.cover,
         due_date: selectedTask.due_date
           ? new Date(selectedTask.due_date)
           : null,
-      }));
+      });
+
       setStartDate(
         selectedTask.due_date ? new Date(selectedTask.due_date) : null
-      ); // Set startDate to the due_date
+      );
     }
   }, [selectedTask]);
 
@@ -64,30 +77,7 @@ function MyFormDialog({
       const formattedDueDate = formData.due_date
         ? formData.due_date.toISOString().split("T")[0]
         : null;
-      if (!selectedValues) {
-        console.error("No users assigned to task");
-        return;
-      } else {
-        // console.log(" #### =The selected Users are" + selectedValues);
 
-        const assignedUsersIds = selectedValues.map((user) => user.value);
-
-        console.log(
-          "The payload data is" + selectedTask + " and " + assignedUsersIds
-        );
-        const payload = {
-          task: selectedTask.id,
-          // assigned_to: assignedUsersIds,
-          assigned_users: assignedUsersIds,
-          // Add other fields as needed
-        };
-        if (payload) {
-          const responseusertask = await api.post("/taskmembers/", payload);
-        }
-        // } catch (error) {
-        //   console.error("Error:", error);
-        // }
-      }
       const response = await api.patch(
         `/tasklist/${selectedTask.id}/`,
         {
@@ -121,21 +111,42 @@ function MyFormDialog({
     }));
   };
 
-  function mapUserToOptions(users) {
-    return users.map((user) => ({
-      value: user.id, // Assuming user id is unique and can be used as value
-      label: user.first_name, // Assuming user name is the label for the option
-    }));
-  }
+  const onSelect = async (selectedList, selectedItem) => {
+    if (!selectedItem) return; // Ensure selectedItem is not null or undefined
 
-  const options = mapUserToOptions(allusers);
+    try {
+      // Post the selected user ID to the server
+      const response = await api.post("/taskmembers/", {
+        assigned_to_id: selectedItem.value, // Assuming value holds the user ID
+        task_id: selectedTask.id,
+      });
 
-  const onSelect = (selectedList, selectedItem) => {
+      // Handle the response as needed
+      const newItemData = response.data;
+    } catch (error) {
+      console.error("Error adding item:", error);
+    }
+
     setSelectedValues(selectedList);
   };
 
-  const onRemove = (selectedList, removedItem) => {
-    setSelectedValues(selectedList);
+  const onRemove = async (selectedList, removedItem) => {
+    console.log(
+      "%%%   I will remove this TaskMember with assigned_to ID: " +
+        removedItem.value +
+        " and task ID: " +
+        selectedTask.id
+    );
+    if (!removedItem) return;
+
+    try {
+      await api.delete(`/taskmembers/${removedItem.value}/${selectedTask.id}/`);
+      setSelectedValues(
+        selectedList.filter((item) => item.value !== removedItem.value)
+      );
+    } catch (error) {
+      console.error("Error removing item:", error);
+    }
   };
   return (
     <Dialog open={open} onClose={handleClose} scroll="paper">
@@ -190,18 +201,25 @@ function MyFormDialog({
                 <div className="col-md-12">
                   <div className="form-group">
                     <label>Check List </label>
-                    <CheckboxList />
+                    <Checklist task={selectedTask} />
                   </div>
                 </div>
               </div>
-              <div className="row"></div>
+
               <div className="row">
                 <div className="col-12">
                   <div className="form-group">
                     <label>Assign Task To</label>
+
                     <CustomMultiselect
-                      options={options}
-                      selectedValues={selectedValues}
+                      options={allusers.map((user) => ({
+                        value: user.id,
+                        label: user.first_name,
+                      }))}
+                      selectedValues={assignedtaskmembers.map((user) => ({
+                        value: user.assigned_to_id,
+                        label: user.assigned_to_first_name,
+                      }))}
                       onSelect={onSelect}
                       onRemove={onRemove}
                       displayValue="label"
@@ -212,13 +230,17 @@ function MyFormDialog({
               <div className="row">
                 <div className="col-12">
                   <label>Due Date</label>
-                  <InfiniteCalendar
+                  {/* <InfiniteCalendar
                     name="due_date"
                     width={400}
                     height={200}
                     selected={startDate}
                     onSelect={handleDateChange} // Pass the handleDateChange function to onSelect
-                  />
+                  /> */}
+                  <div className="card flex justify-content-center">
+            <Calendar value={new Date()} onChange={(e) => setStartDate(e.value)} />
+        </div>
+                  
                 </div>
               </div>
             </div>

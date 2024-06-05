@@ -45,12 +45,19 @@ code {
 /* task card input section */
 input-section {
   margin-bottom: 10px;
+  width: 100%;
 }
 .input-field {
   flex: 1;
   padding: 8px;
-  margin-right: 20px;
+  margin-right: 10px;
   border-radius: 10px 0 10px 0;
   border: 1px solid;
-  width: 100px;
+  width: 85%;
+}
+.centered-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 20vh; /* Adjust height as needed */
 }
