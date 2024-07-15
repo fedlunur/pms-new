@@ -179,14 +179,14 @@ function MyFormDialog({
                   <div className="form-group">
                     <label>Assign Task To</label>
                     <CustomMultiselect
-                      options={allusers.map((user) => ({
+                      options={allusers ? allusers.map((user) => ({
                         value: user.id,
-                        label: user.first_name,
-                      }))}
-                      selectedValues={assignedtaskmembers.map((user) => ({
+                        label: user.first_name || "",
+                      })) : []}
+                      selectedValues={assignedtaskmembers ? assignedtaskmembers.map((user) => ({
                         value: user.assigned_to_id,
-                        label: user.assigned_to_first_name,
-                      }))}
+                        label: user.assigned_to_first_name || "",
+                      })) : []}
                       onSelect={onSelect}
                       onRemove={onRemove}
                       displayValue="label"

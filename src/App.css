@@ -1,4 +1,6 @@
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @import "react-datetime/css/react-datetime.css";
 .App {

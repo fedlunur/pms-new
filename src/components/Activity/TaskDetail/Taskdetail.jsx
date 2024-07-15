@@ -33,6 +33,7 @@ function Taskdetail() {
   const [activities, setActivities] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [taskmembers, setTaskmembers] = useState([]);
+  const [taskchecklist,setTaskchecklist]=useState([])
   const [users, setUsers] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [filters, setFilters] = useState(null);
@@ -54,13 +55,16 @@ function Taskdetail() {
         tasksResponse,
         taskMemberResonse,
         userResponse,
+        taskchecklist,
        
       ] = await Promise.all([
         api.get("/project/"),
         api.get("/activitylist/"),
         api.get("/tasklist/"),
         api.get("/taskmembers/"),
+       
         api.get("/users/"),
+        api.get("/taskchecklist/"),
       ]);
 
       if (projectsResponse.status < 200 || projectsResponse.status >= 300) {
@@ -72,12 +76,14 @@ function Taskdetail() {
       const tasksData = tasksResponse.data;
       const usersData = userResponse.data;
       const taskmemberdata=taskMemberResonse.data;
+      const taskchecklistdata=taskchecklist.data
     
       setProjects(projectsData);
       setActivities(activitiesData);
       setTasks(tasksData);
       setUsers(usersData);
       setTaskmembers(taskmemberdata);
+      setTaskchecklist(taskchecklistdata);
 
 
     } catch (error) {
@@ -106,7 +112,11 @@ const onGlobalFilterChange = (e) => {
   setFilters(_filters);
   setGlobalFilterValue(value);
 };
-
+const rowNumberTemplate = (rowData, column) => {
+  return (
+    <span>{column.rowIndex + 1}</span>
+  );
+};
 const initFilters = () => {
   setFilters({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -220,8 +230,25 @@ const initFilters = () => {
       />
     );
   };
+  
+
+
   const activityBodyTemplate = (rowData) => {
-    return <ProgressBar value={rowData.activity} showValue={false} style={{ height: '6px' }}></ProgressBar>;
+    const relatedTasks = taskchecklist.filter((taskm) => taskm.task === rowData.id);
+
+    // Calculate completed and incomplete tasks
+    const completedTasks = relatedTasks.filter((task) => task.status).length;
+    const totalTasks = relatedTasks.length;
+    const completedPercentage = totalTasks ? (completedTasks / totalTasks) * 100 : 0;
+    const incompletePercentage = totalTasks ? ((totalTasks - completedTasks) / totalTasks) * 100 : 0;
+  
+    return (
+      <div>
+        <ProgressBar value={completedPercentage} showValue={true} style={{ height: '10px', backgroundColor: '#d4edda' }}></ProgressBar>
+        <br></br>
+        <ProgressBar value={incompletePercentage} showValue={true} style={{ height: '10px', backgroundColor: '#f8d7da' }}></ProgressBar>
+      </div>
+    );
 };
   const renderHeader = () => {
     return (
@@ -386,6 +413,7 @@ const header = renderHeader();
                     filters={filters} globalFilterFields={['task_name', 'description', 'projectname', 'activity','due_date', 'status']} header={header}
                     emptyMessage="No customers found."
         >
+          <Column header="#" body={rowNumberTemplate} style={{ width: '5%' }} />
           <Column field="task_name" header="Task Name" sortable style={{ width: '25%' }} />
           <Column field="description" header="Description" sortable style={{ width: '50%' }} />
           <Column field="projectname" body={getProjectNameUsingActivity}  filter  header="Project Name" sortable style={{ width: '25%' }} />
@@ -393,7 +421,7 @@ const header = renderHeader();
 
           <Column field="team" body={teammemberTemplate} header="TeamMembers"  style={{ width: '25%' }} />
 
-          <Column field="cover" header="Cover" sortable style={{ width: '25%' }} />
+          {/* <Column field="cover" header="Cover" sortable style={{ width: '25%' }} /> */}
           <Column field="due_date" header="Due Date" sortable style={{ width: '25%' }} />
           <Column field="activity" header="Completed/Not Completed"  style={{ minWidth: '12rem' }} body={activityBodyTemplate}  />
 
