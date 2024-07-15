@@ -4,22 +4,26 @@
   "private": true,
   "dependencies": {
     "@atlaskit/theme": "^12.7.1",
+    "@date-io/date-fns": "^3.0.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-regular-svg-icons": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fullcalendar/bootstrap": "^6.1.14",
     "@fullcalendar/core": "^6.1.13",
-    "@fullcalendar/daygrid": "^6.1.13",
-    "@fullcalendar/interaction": "^6.1.13",
+    "@fullcalendar/daygrid": "^6.1.14",
+    "@fullcalendar/interaction": "^6.1.14",
     "@fullcalendar/list": "^6.1.13",
-    "@fullcalendar/react": "^6.1.13",
-    "@fullcalendar/timegrid": "^6.1.13",
+    "@fullcalendar/react": "^6.1.14",
+    "@fullcalendar/timegrid": "^6.1.14",
+    "@heroicons/react": "^1.0.6",
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
     "@mui/icons-material": "^5.15.14",
     "@mui/material": "^5.15.15",
-    "@mui/x-date-pickers": "^7.6.1",
+    "@mui/x-date-pickers": "^7.7.1",
+    "@tailwindcss/forms": "^0.5.7",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -32,9 +36,10 @@
     "dayjs": "^1.11.11",
     "jquery": "^3.7.1",
     "jwt-decode": "^4.0.0",
+    "moment": "^2.30.1",
     "multiselect-react-dropdown": "^2.0.25",
-    "patch-package": "^8.0.0",
     "preact": "^10.22.0",
+    "primeicons": "^7.0.0",
     "primereact": "^10.6.5",
     "react": "^18.2.0",
     "react-addons-shallow-compare": "^15.6.3",
@@ -43,28 +48,23 @@
     "react-big-calendar": "^1.12.2",
     "react-bootstrap": "^2.10.2",
     "react-calendar": "^5.0.0",
-    "react-charts": "^0.0.1",
+    "react-chartjs-2": "^5.2.0",
     "react-color": "^2.19.3",
     "react-csv": "^2.2.2",
+    "react-datepicker": "^7.1.0",
+    "react-datetime": "^3.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.51.5",
-    "react-icons": "^5.0.1",
-    "react-infinite-calendar": "^1.2.2",
+    "react-icons": "^5.2.1",
+    "react-infinite-calendar": "^2.3.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^5.0.1",
     "react-table": "^7.8.0",
-    "react-transition-group": "^4.4.5",
     "reactstrap": "^8.6.0",
     "styled-components": "^5.2.0",
     "sweetalert2": "^11.6.13",
+    "sweetalert2-react-content": "^5.0.7",
     "typescript": "^5.4.5",
     "web-vitals": "^2.1.4"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -83,5 +83,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.4"
   }
 }

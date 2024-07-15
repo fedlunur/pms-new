@@ -7,6 +7,7 @@ import useAxios from "../../utils/useAxios";
 import { Draggable } from "react-beautiful-dnd";
 import { DragDropContext } from "react-beautiful-dnd";
 import MyFormDialog from "./EditTaskDialog";
+import { Link } from 'react-router-dom';
 
 import {
   Avatar,
@@ -186,7 +187,7 @@ export default function Column({
       (member) => member.task_id === selectedtask.id
     );
     setSingletaskmembers(taskMemberslist);
-    console.log("%%%%%% After mattters ", singletaskmembers);
+
     setOpen(true);
   };
 
@@ -261,13 +262,15 @@ export default function Column({
     <Container className="column">
       {
         <>
-          <MyFormDialog
-            open={open}
-            selectedTask={selectedTask}
-            allusers={allusers}
-            assignedtaskmembers={singletaskmembers}
-            handleClose={handleClose}
-            handleTaskUpdate={handleTaskUpdate}
+          < MyFormDialog
+
+             open={open}
+             selectedTask={selectedTask}
+             allusers={allusers}
+             assignedtaskmembers={singletaskmembers}
+             handleClose={handleClose}
+             handleTaskUpdate={handleTaskUpdate}
+
           />
           <ConfirmationDialog
             open={confirmationOpen}
@@ -358,15 +361,16 @@ export default function Column({
                             <div className="card-tools">
                               <button
                                 onClick={() => startEdit(index)}
-                                className="btn btn-tool "
+                              
                               >
-                                <i className="fas fa-pen" />
+                              <BiEdit />
                               </button>
                               <button
                                 onClick={() => removeTodo(task.id)}
-                                className="btn btn-tool"
+                               
                               >
-                                <i className="fas fa-trash" />
+                          
+                                <BiTrash />
                               </button>
                             </div>
                           </small>{" "}
@@ -424,21 +428,24 @@ export default function Column({
 
                               <button
                                 onClick={() => handleOpen(task, taskmembers)}
-                                className="btn btn-tool"
+                                className=" btn-tool"
                               >
-                                <i className="fas fa-pen" />
+                              <BiEdit />
                               </button>
 
-                              <button
-                                onClick={() => getDetails(task.id)}
-                                className="btn btn-tool"
-                              >
-                                <i className="fas fa-book" />
-                              </button>
+                          
                             </div>
                           </small>
                         </span>
                       </div>
+                      <div>
+                          <Link to={`/issues/${task.id}`}> 
+                            <button className=" btn-tool">
+                              {/* <BiBookAdd />  */}
+                              Issues
+                            </button>
+                          </Link>
+                        </div>
 
                       {provided.placeholder}
                     </ContainerCard>

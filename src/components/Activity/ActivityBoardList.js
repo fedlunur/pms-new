@@ -16,7 +16,7 @@ export default function ActivityBoardList() {
   return (
     <Layout>
       <div>
-        <div className="content-wrapper">
+        <div className="content-wrapper" style={{ minHeight: '806px' }}>
           {/* Main content */}
           <div className="centered-section">
           <section className="content">

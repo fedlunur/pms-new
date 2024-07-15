@@ -24,7 +24,7 @@ function ActivityList({ activity }) {
   }, []);
 
   return (
-    <div className="activity">
+    <div className="activity" >
       <h2>{activity.name}</h2>
       <TaskCardList tasks={tasks} activityId={activity.id} />
     </div>

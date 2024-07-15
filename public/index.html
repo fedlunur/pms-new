@@ -64,7 +64,7 @@
     />
     <title>React App</title>
   </head>
-  <body class="hold-transition sidebar-mini layout-fixed">
+  <body class="hold-transition sidebar-mini layout-fixed font-dm bg-lightPrimary">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
       <div class="wrapper">Welcome</div>
@@ -102,6 +102,15 @@
     <script src="%PUBLIC_URL%/dist/js/adminlte.js"></script>
     <script src="%PUBLIC_URL%/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="%PUBLIC_URL%/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+      if (localStorage.theme === 'dark' || !('theme' in localStorage)) {
+        document.querySelector('html').classList.add('dark');
+        document.querySelector('html').style.colorScheme = 'dark';
+      } else {
+        document.querySelector('html').classList.remove('dark');
+        document.querySelector('html').style.colorScheme = 'light';
+      }        
+    </script>
    <script>
     $(function () { 
 

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { classNames } from "primereact/utils";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { TaskCardAttachmentService } from "./services/TaskCardAttachmentService"; 
+
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
@@ -24,21 +24,28 @@ import { Dropdown } from 'primereact/dropdown';
 import IconButton from '@material-ui/core/IconButton';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import { BiPencil, BiTrash } from "react-icons/bi";
+import axios from "axios";
 
 function   extractFilenameFromURLS  (url)  {
     // Create a URL object from the provided URL string
-    const urlObject = new URL(url);
-    // Get the pathname from the URL object
-    const pathname = urlObject.pathname;
-    // Extract the filename from the pathname
-    const filename = pathname.substring(pathname.lastIndexOf('/') + 1);
-    return filename;
+    try {
+      // Create a URL object from the provided URL string
+      const urlObject = new URL(url);
+      // Get the pathname from the URL object
+      const pathname = urlObject.pathname;
+      // Extract the filename from the pathname
+      const filename = pathname.substring(pathname.lastIndexOf('/') + 1);
+      return filename;
+  } catch (error) {
+      console.error('Invalid URL:', url);
+      return null; // or handle the error as per your application's requirements
+  }
 };
 function TaskAttachmentList() {
   let emptyAttachment = {
     name: "",
     path: "",
-    task_card: ""
+    task_card: null
   };
 
   const [attachments, setAttachments] = useState([]);
@@ -330,79 +337,72 @@ useEffect(() => {
 
   const header = (
     <div className="table-header">
-      <h5 className="mx-0 my-1">Manage Task Card Attachments</h5>
-      <span className="p-input-icon-left">
-        <i className="pi pi-search" />
-        <InputText
-          type="search"
-          onInput={(e) => setGlobalFilter(e.target.value)}
-          placeholder="Search..."
-        />
-      </span>
-    </div>
+    <span className="p-input-icon-left">
+      <i className="pi pi-search" style={{ marginRight: '5px' }} />
+      <InputText
+        type="search"
+        onInput={(e) => setGlobalFilter(e.target.value)}
+        placeholder="Search..."
+        className="search-input"
+      />
+    </span>
+  </div>
   );
   const extractFilenameFromURL = (url) => {
-    // Create a URL object from the provided URL string
-    const urlObject = new URL(url);
-    // Get the pathname from the URL object
-    const pathname = urlObject.pathname;
-    // Extract the filename from the pathname
-    const filename = pathname.substring(pathname.lastIndexOf('/') + 1);
-    return filename;
-};
-    
-const DownloadFile = async (filePath) => {
+    const parts = url.split('/');
+    return parts[parts.length - 1];
+  };
+  
+  const DownloadFile = async (filePath, api) => {
     try {
-        // Extract the filename from the provided file path
-        const filename = extractFilenameFromURL(filePath);
-        // Construct the download URL
-        const downloadURL = `/api/download/${filename}/`;
-        
-        // Fetch the file from the download URL
-        const response = await fetch(downloadURL);
-        if (!response.ok) {
-            throw new Error('Failed to download file');
-        }
-
-        // Create a blob from the response data
-        const blob = await response.blob();
-        // Create a URL for the blob
-        const url = window.URL.createObjectURL(blob);
-
-        // Create a temporary link element to trigger the download
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', filename);
-        document.body.appendChild(link);
-        // Click the link to initiate the download
-        link.click();
-        // Cleanup: remove the link element from the DOM
-        link.parentNode.removeChild(link);
+      console.log("Here is the file path to download before ", filePath);
+      // Extract the filename from the provided file path
+      const filename = extractFilenameFromURL(filePath);
+      console.log("I will download the file from ", filename);
+      
+      // Construct the download URL
+      const downloadURL = `/download/${filename}/`;
+      console.log('The api URL is',downloadURL)
+      // Fetch the file from the download URL using axios
+      const response = await api.get(downloadURL, {
+        responseType: 'blob',  // Important: handle the response as a Blob
+      });
+  
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      
+      // Create a temporary link element to trigger the download
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      // Click the link to initiate the download
+      link.click();
+      // Cleanup: remove the link element from the DOM
+      document.body.removeChild(link);
     } catch (error) {
-        console.error('Error downloading file:', error);
+      console.error('Error downloading file:', error);
     }
-};
-
-
+  };
   
 const downloadBodyTemplate = (rowData) => {
+  const api = useAxios();
     return (
-        <IconButton onClick={() => DownloadFile(rowData.path)}>
+  
+        <IconButton onClick={() => DownloadFile(rowData.path,api)}>
         <CloudDownloadIcon />
     </IconButton>
     );
 };
-// const findTaskNameById = (taskId) => {
+const findTaskNameById = (taskId) => {
    
-//     const foundTask = alltasks.find(task => task.id === taskId); // Find by ID
-//     return foundTask ? foundTask.task_name : 'Task not found'; // Handle missing task
-//   };
+    const foundTask = alltasks.find(task => task.id === taskId); // Find by ID
+    return foundTask ? foundTask.task_name : 'Task not found'; // Handle missing task
+  };
 const taskBody = (rowData) => {
-
-   
-    return (
+   return (
         <p>
-          { rowData.task_card.task_name}
+          { findTaskNameById(rowData.task_card)}
    {/* {taskName} */}
         </p>
        
@@ -459,32 +459,27 @@ const taskBody = (rowData) => {
       />
     </React.Fragment>
   );
+
   const onFileChange = (e) => {
+
     let _attachment = { ...attachment };
     _attachment.path = e.target.files[0];
+   
     setAttachment(_attachment);
+
+
 };
   return (
 
     <Layout>
-    <div class="content-wrapper">
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row mb-2">
-            <div class="col-sm-6">
-              <h1 class="m-0">Task Detail </h1>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="content">
-        <div className="container-fluid">
-          <section className="content">
-            <div className="container-fluid">
+    <div class="content-wrapper" style={{ minHeight: '806px' }}>
+      <section className="content">
+            <div className="container-fluid py-5 px-5">
     <div className="datatable-crud-demo">
       <Toast ref={toast} />
 
       <div className="card">
+      <h1 class="m-0">Tasks </h1>
         <Toolbar
           className="mb-4"
           left={leftToolbarTemplate}
@@ -530,6 +525,8 @@ const taskBody = (rowData) => {
             field="image"
             header="File"
             body={downloadBodyTemplate}
+
+            
           ></Column>
          
           <Column
@@ -540,13 +537,7 @@ const taskBody = (rowData) => {
           ></Column>
         </DataTable>
       </div>
-
-
-
-
-
-
-      <Dialog
+       <Dialog
         visible={attachmentDialog}
         style={{ width: "450px" }}
         header="Attachment Details"
@@ -554,7 +545,7 @@ const taskBody = (rowData) => {
         className="p-fluid"
         footer={attachmentDialogFooter}
         onHide={hideDialog}
-      >
+        >
         <div className="field">
           <label htmlFor="name">Name</label>
           <InputText
@@ -637,7 +628,9 @@ const taskBody = (rowData) => {
         </div>
       </Dialog>
     </div>
-    </div></section></div></div></div></Layout>
+    </div></section></div>
+    
+    </Layout>
   );
 }
 

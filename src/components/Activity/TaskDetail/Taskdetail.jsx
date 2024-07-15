@@ -258,15 +258,10 @@ const header = renderHeader();
   return (
     <Layout>
       <div class="content-wrapper">
-        <div class="content-header">
-          <div class="container-fluid">
-            <div class="row mb-2">
-              <div class="col-sm-6">
-                <h1 class="m-0">Task Detail </h1>
-              </div>
-            </div>
-          </div>
-        </div>
+      <section className="content">
+            <div className="container-fluid py-5 px-5">
+   
+       
         <div className="content">
           <div className="container-fluid">
             <section className="content">
@@ -423,6 +418,8 @@ const header = renderHeader();
             </section>
           </div>
         </div>
+        </div>
+        </section>
       </div>
     </Layout>
   );

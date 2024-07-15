@@ -23,12 +23,11 @@ export default function ProjectsDashboard() {
 
   return (
     <Layout>
-      <div>
-        <div className="content-wrapper">
-          {/* Main content */}
-          <section className="content">
-            <h1>Projects List</h1>
-            <div className="container-fluid">
+   
+   <div class="content-wrapper" style={{ minHeight: '806px' }}>
+      <section className="content">
+            <div className="container-fluid py-5 px-5">
+         
               {/* Small boxes (Stat box) */}
               <div className="row">
                 {allprojects.map((Project,index) => (
@@ -43,7 +42,7 @@ export default function ProjectsDashboard() {
                 ))}
               </div>
        
-       
+     
           <DatatableProjects
             projects={allprojects}
             teammembers={allteammembers}
@@ -51,12 +50,9 @@ export default function ProjectsDashboard() {
             activities={allactivities}
             tasks={alltasks}
           />
-               </div>
-             </section>
-          {/* 
-/* new data table      */}
-        </div>
-      </div>
+      </div></section></div>
+            
+      
    
     </Layout>
 

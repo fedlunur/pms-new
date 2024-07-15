@@ -30,10 +30,12 @@ const ProjectListDT = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="container-fluid" style={{ paddingTop: 100 }}>
-      <h1>Projects</h1>
+  
 
+      <div className="container-fluid py-5 px-5">
+ 
       <div className="card-container">
+     
         {data.map((Project) => (
           <ProjectCard
             key={Project.id}
@@ -42,7 +44,8 @@ const ProjectListDT = () => {
           />
         ))}
       </div>
-    </div>
+      </div>
+    
   );
 };
 

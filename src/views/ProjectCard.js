@@ -25,7 +25,8 @@ import {
 const ProjectCard = ({ title, content }) => {
   const percentage = 20;
   return (
-    <Card className="my-card">
+    <Card >
+          
       <Card.Body>
         <Card.Title className="card-title">{title}</Card.Title>
         <Card.Text className="card-text">{content}</Card.Text>

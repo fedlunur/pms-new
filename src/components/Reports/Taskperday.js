@@ -15,15 +15,15 @@ import { Chart } from 'primereact/chart';
             labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
             datasets: [
                 {
-                    label: 'My First dataset',
+                    label: 'On Progess',
                     backgroundColor: documentStyle.getPropertyValue('--blue-500'),
                     borderColor: documentStyle.getPropertyValue('--blue-500'),
                     data: [65, 59, 80, 81, 56, 55, 40]
                 },
                 {
-                    label: 'My Second dataset',
-                    backgroundColor: documentStyle.getPropertyValue('--pink-500'),
-                    borderColor: documentStyle.getPropertyValue('--pink-500'),
+                    label: 'Done',
+                    backgroundColor: '#6366f1',
+                    borderColor: documentStyle.getPropertyValue('--text-indigo-800'),
                     data: [28, 48, 40, 19, 86, 27, 90]
                 }
             ]

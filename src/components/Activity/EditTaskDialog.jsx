@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
@@ -7,16 +8,11 @@ import DialogActions from "@material-ui/core/DialogActions";
 import CustomMultiselect from "./MultiSelect";
 import { ChromePicker } from "react-color";
 import useAxios from "../../utils/useAxios";
-// import InfiniteCalendar from "react-infinite-calendar";
-// import "react-infinite-calendar/styles.css";
-
-// import 'react-calendar/dist/Calendar.css';
-// import Calendar from 'react-calendar';
 import Checklist from "./Checklist";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { Calendar } from 'primereact/calendar';
+
+import ReactDatePicker from "react-datepicker";
+
+
 function MyFormDialog({
   open,
   selectedTask,
@@ -25,13 +21,10 @@ function MyFormDialog({
   handleClose,
   handleTaskUpdate,
 }) {
- 
-
   const api = useAxios();
-  const [startDate, setStartDate] = useState();
-
+  const [startDate, setStartDate] = useState(null);
   const [selectedValues, setSelectedValues] = useState([]);
-  const [cover, setCover] = useState();
+  const [cover, setCover] = useState("");
   const [assignedmember, setAssignedMember] = useState([]);
   const [formData, setFormData] = useState({
     task_name: selectedTask ? selectedTask.task_name : "",
@@ -40,17 +33,15 @@ function MyFormDialog({
     cover: selectedTask ? selectedTask.cover : null,
   });
 
-  // task check list
-
-  // Usage
-
   const handleChangeColor = (newColor) => {
     setCover(newColor.hex);
   };
+
   const handleDateChange = (date) => {
+    setStartDate(date);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      due_date: date, // Update formData with the selected date
+      due_date: date,
     }));
   };
 
@@ -60,9 +51,7 @@ function MyFormDialog({
         task_name: selectedTask.task_name,
         status: selectedTask.status,
         cover: selectedTask.cover,
-        due_date: selectedTask.due_date
-          ? new Date(selectedTask.due_date)
-          : null,
+        due_date: selectedTask.due_date ? new Date(selectedTask.due_date) : null,
       });
 
       setStartDate(
@@ -73,7 +62,6 @@ function MyFormDialog({
 
   const handleSubmit = async () => {
     try {
-      // Format due_date to "YYYY-MM-DD" format
       const formattedDueDate = formData.due_date
         ? formData.due_date.toISOString().split("T")[0]
         : null;
@@ -88,7 +76,7 @@ function MyFormDialog({
         {
           headers: {
             "Content-Type": "application/json",
-          },
+          }
         }
       );
 
@@ -112,16 +100,14 @@ function MyFormDialog({
   };
 
   const onSelect = async (selectedList, selectedItem) => {
-    if (!selectedItem) return; // Ensure selectedItem is not null or undefined
+    if (!selectedItem) return;
 
     try {
-      // Post the selected user ID to the server
       const response = await api.post("/taskmembers/", {
-        assigned_to_id: selectedItem.value, // Assuming value holds the user ID
+        assigned_to_id: selectedItem.value,
         task_id: selectedTask.id,
       });
 
-      // Handle the response as needed
       const newItemData = response.data;
     } catch (error) {
       console.error("Error adding item:", error);
@@ -131,12 +117,6 @@ function MyFormDialog({
   };
 
   const onRemove = async (selectedList, removedItem) => {
-    console.log(
-      "%%%   I will remove this TaskMember with assigned_to ID: " +
-        removedItem.value +
-        " and task ID: " +
-        selectedTask.id
-    );
     if (!removedItem) return;
 
     try {
@@ -148,12 +128,12 @@ function MyFormDialog({
       console.error("Error removing item:", error);
     }
   };
+
   return (
     <Dialog open={open} onClose={handleClose} scroll="paper">
       <DialogTitle>{selectedTask ? selectedTask.task_name : ""}</DialogTitle>
       <DialogContent dividers>
         <div style={{ maxHeight: "550px", overflowY: "auto" }}>
-          {/* Your existing card content */}
           <div className="card card-default">
             <div className="card-body">
               <div className="row">
@@ -173,18 +153,6 @@ function MyFormDialog({
                     </select>
                   </div>
                 </div>
-                {/* <div className="col-md-6">
-                  <div className="form-group">
-                    <label>Task Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={formData.task_name}
-                      onChange={(e) => handleChange(e)}
-                      name="task_name"
-                    />
-                  </div>
-                </div> */}
                 <div className="col-md-4">
                   <div className="form-group">
                     <label>Legend Color </label>
@@ -210,7 +178,6 @@ function MyFormDialog({
                 <div className="col-12">
                   <div className="form-group">
                     <label>Assign Task To</label>
-
                     <CustomMultiselect
                       options={allusers.map((user) => ({
                         value: user.id,
@@ -227,20 +194,18 @@ function MyFormDialog({
                   </div>
                 </div>
               </div>
+
               <div className="row">
                 <div className="col-12">
                   <label>Due Date</label>
-                  {/* <InfiniteCalendar
-                    name="due_date"
-                    width={400}
-                    height={200}
-                    selected={startDate}
-                    onSelect={handleDateChange} // Pass the handleDateChange function to onSelect
-                  /> */}
                   <div className="card flex justify-content-center">
-            <Calendar value={new Date()} onChange={(e) => setStartDate(e.value)} />
-        </div>
-                  
+                   
+                    <ReactDatePicker
+                      selected={startDate}
+                      onChange={handleDateChange}
+                      dateFormat="yyyy/MM/dd"
+                    />
+                  </div>
                 </div>
               </div>
             </div>

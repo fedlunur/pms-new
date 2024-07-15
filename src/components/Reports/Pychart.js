@@ -4,6 +4,7 @@ import { Chart } from 'primereact/chart';
 import DataService from '../DataServices';
 import { chartColors } from './ColorsUtil';
 
+
 import { Button } from 'primereact/button';
         
 import { Dropdown } from 'primereact/dropdown';
@@ -29,9 +30,9 @@ export default function PieChartDemo() {
 
     const searchbyproject = () => {
         if (selectedProject) {
-            console.log("Selected Project====> ",selectedProject)
+           
             const filteredActivities = allactivities.filter(activity => activity.project_name === selectedProject);
-            console.log("££££££----- >  Filtered Activities ",filteredActivities)
+           
             const tasksPerActivity = filteredActivities.map(activity => {
                 const count = alltasks.filter(task => task.activity === activity.id).length;
                 return count;
@@ -50,7 +51,7 @@ export default function PieChartDemo() {
 
             setUniqueActivities(filteredActivities);
             setChartData(data);
-            console.log("££££££----- >  Updated chart with  ",data)
+          
         }
     };
 
@@ -89,22 +90,29 @@ export default function PieChartDemo() {
     }, [allprojects, allactivities, alltasks, selectedProject]);
 
     return (
-        <div className="card flex justify-content-center">
-            <Button icon="pi pi-search" onClick={searchbyproject} aria-label="Search" />
-            <div className="field">
-                <label htmlFor="task_card">Select Project</label>
+        <div className="card flex justify-content-center" style={{height:421}}>
+            
+            <div className="field md-12" style={{marginTop:-50,marginLeft:20 }}>
                 <Dropdown
-                    id="task_card"
+                    id="task_card" className='font-bold'
                     value={selectedProject}
                     options={projectsList}
                     onChange={handleChange}
                     filter
                     showClear={true}
-                    placeholder="Select Task Card"
+                    placeholder="Select Project"
                 />
-            </div>
+ <Button
+      icon="pi pi-search"
+      onClick={searchbyproject}
+      aria-label="Search"
+      style={{ backgroundColor: 'transparent', border: 'none', color: '#6366f1',marginTop:-10 }}
+    />            </div>
             <hr />
+            <br></br>
+            <br></br>
             <Chart type="pie" data={chartData} options={chartOptions} className="w-full md:w-30rem" />
         </div>
+        
     );
 }

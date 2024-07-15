@@ -11,10 +11,7 @@ export default function ActivityCard({ projects }) {
   const api = useAxios();
   const { allactivities,alltasks,alluserss,alltaskmembers, loading, error, activities_by_project, tasksbyproject } = DataService(); // Assuming useCrud fetches data
 
-// Get activities for the project (assuming `projects.id` holds the project ID)
-// Use optional chaining to handle potential undefined project ID
-console.log("Before ###The Fetched Activites  are:", allactivities); // Log activities after fetching
-console.log("Before ### Fetched taks  already fetched from useCrud",alltasks);
+
 const activitiesForProject = activities_by_project(projects);
 useEffect(() => {
   // Set activities and tasks based on props or useCrud

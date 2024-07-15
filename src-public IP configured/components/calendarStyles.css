@@ -1,0 +1,177 @@
+/* Change Calendar Background Color: */
+.fc {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Change Header Background and Text Color: */
+.fc-toolbar {
+  background-color: #c6d2db;
+  color: #ffffff;
+  border-radius: 5px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fc-toolbar h2 {
+  color: black;
+  font-size: 16px;
+}
+
+.fc .fc-button {
+  background-color: #b6bbbe;
+  color: #000;
+  border: none;
+  margin: 0 2px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.fc .fc-button:hover {
+  background-color: #d0d6da;
+  color: #000;
+}
+
+/* Button Active State */
+.fc .fc-button:active {
+  transform: scale(0.98);
+  background-color: #bbc0c4;
+  border-color: #a3a9ad;
+  color: black;
+}
+/* Calendar Title */
+.fc .fc-toolbar-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: black;
+}
+
+/* Day Headers */
+.fc .fc-col-header-cell {
+  background-color: #c6d2db;
+  color: black;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 1px;
+  padding: 10px;
+}
+
+/* Change Event Colors: */
+.fc .fc-event {
+  background-color: #b8d1d4;
+  color: #000;
+  border: none;
+  border-radius: .35px;
+  padding: 7px;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.fc .fc-event:hover {
+  background-color: #a8c2c5;
+  color: #000;
+  transform: scale(1.05);
+}
+
+
+/* Today Highlight */
+.fc .fc-day-today {
+  background-color: #e4decd;
+  border-color: #e4decd;
+}
+/* Highlight Weekend Days: */
+.fc .fc-day.fc-sun,
+.fc .fc-day.fc-sat {
+  background-color: #f0f8ff;
+}
+ 
+/* List View Event */
+.fc .fc-list-event {
+  border-left: 4px solid #b8c3ce;
+  background-color: #ffffff;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.fc .fc-daygrid-day-number {
+  font-size: 14px;
+  color: #343a40;
+}
+
+.fc .fc-daygrid-day-frame {
+  border: 1px solid #e9ecef;
+}
+
+/* Styling Time Grid View: */
+.fc .fc-timegrid-slot-label {
+  font-weight: bold;
+  color: #6c757d;
+}
+
+.fc .fc-timegrid-slot-lane {
+  border-top: 1px solid #dee2e6;
+}
+
+.fc .fc-timegrid-event {
+  background-color: #f3ebd0;
+  border-color: #f3ebd0;
+  color: black;
+}
+/* List View Event */
+.fc .fc-list-event {
+  border-left: 4px solid #b8c3ce;
+  background-color: #ffffff;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+}
+
+.fc .fc-list-event:hover {
+  background-color: #e9ecef;
+  transform: scale(1.02);
+}
+
+/* List View Time */
+.fc .fc-list-event-time {
+  font-weight: bold;
+  color: #000;
+}
+.fc .fc-list-heading {
+  background-color: #343a40;
+  color: #ffffff;
+  padding: 15px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 5px;
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+  .fc-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fc-toolbar .fc-toolbar-title {
+    margin-bottom: 10px;
+  }
+
+  .fc-toolbar .fc-button {
+    margin: 5px 0;
+  }
+}

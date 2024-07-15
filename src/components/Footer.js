@@ -1,11 +1,12 @@
 import React from "react";
 
 export default function Footer() {
+
   return (
-    <div>
+    <div style={{bottom:5}}>
       <footer className="main-footer">
         <div className="float-right d-none d-sm-inline-block">
-          Copyright © 2024 <a href="#">CDHI-PMS</a>.
+          Copyright © {new Date().getFullYear()} <a href="#">CDHI-PMS</a>.
         </div>
       </footer>
     </div>

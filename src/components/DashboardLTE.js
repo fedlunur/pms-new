@@ -6,9 +6,10 @@ import Taksperday from "./Reports/Taskperday";
 import PieChartDemo from "./Reports/Pychart";
 import HorizontalBarDemo from "./Reports/HorizontalBar";
 import StackedBarDemo from "./Reports/StackBar";
-
+import { Card } from "primereact/card";
 
 export default function DashboardLTE() {
+  
   const [projects, setProjects] = useState([]);
   const [completedProjects, setCompletedprojects] = useState([]);
   const [activities, setActivities] = useState([]);
@@ -61,7 +62,6 @@ export default function DashboardLTE() {
     }
   };
   const ProjectDetail = (projects, members, users, actvivitydata) => {
-  
     history.push("/projectsDashboard", {
       projects: projects,
       users: users,
@@ -74,145 +74,98 @@ export default function DashboardLTE() {
       <div>
         <div className="content-wrapper">
           <section className="content">
-            <h1>Projects List</h1>
-            <div className="container-fluid">
+            <div className="container-fluid py-5 px-5">
               <div className="row">
                 <div className="col-lg-3 col-6">
-                  <div className="small-box bg-info">
+                  <div className="small-box bg-white">
                     <div className="inner">
                       <h3>{projects.length}</h3>
-                      <p>Total Projects</p>
+                      <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">
+                        Total Projects
+                      </p>
                     </div>
                     <div className="icon">
-                      <i className="ion ion-bag" />
+                      <i className="fas fa-project-diagram text-indigo-600 text-xl" />
                     </div>
                     <a
                       onClick={() =>
                         ProjectDetail(projects, members, users, activities)
                       }
-                      className="small-box-footer"
+                      className="small-box-footer" style={{background:'#dde2e9'}}
                     >
                       More info <i className="fas fa-arrow-circle-right" />
                     </a>
                   </div>
                 </div>
                 <div className="col-lg-3 col-6">
-                  <div className="small-box bg-success">
+                  <div className="small-box bg-white">
                     <div className="inner">
                       <h3>
                         {activities.length}
-                        <sup style={{ fontSize: 20 }}>%</sup>
+                        <sup style={{ fontSize: 20 }}></sup>
                       </h3>
-                      <p>Total Actitvities</p>
+                      <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">
+                        Total Actitvities
+                      </p>
                     </div>
                     <div className="icon">
-                      <i className="ion ion-stats-bars" />
+                      <i className="ion ion-stats-bars text-blue-500" />
                     </div>
-                    <a href="#" className="small-box-footer">
+                    <a href="#" className="small-box-footer" style={{background:'#dde2e9'}}>
                       More info <i className="fas fa-arrow-circle-right" />
                     </a>
                   </div>
                 </div>
                 <div className="col-lg-3 col-6">
-                  <div className="small-box bg-warning">
+                  <div className="small-box bg-white">
                     <div className="inner">
                       <h3>{completedActivities}</h3>
-                      <p>Completed Activities</p>
+                      <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">
+                        Completed Activities
+                      </p>
                     </div>
                     <div className="icon">
-                      <i className="ion ion-person-add" />
+                      <i className="ion ion-person-add" style={{color:'#a7b4c6'}} />
                     </div>
-                    <a href="#" className="small-box-footer">
+                    <a href="#" className="small-box-footer" style={{background:'#dde2e9'}}>
                       More info <i className="fas fa-arrow-circle-right" />
                     </a>
                   </div>
                 </div>
                 <div className="col-lg-3 col-6">
-                  <div className="small-box bg-danger">
+                  <div className="small-box bg-white">
                     <div className="inner">
                       <h3>{users.length}</h3>
-                      <p>Total Members</p>
+                      <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">
+                        Total Members
+                      </p>
                     </div>
                     <div className="icon">
-                      <i className="ion ion-pie-graph" />
+                      <i className="fa fa-users text-orange-400" />
                     </div>
                     <a
                       onClick={() =>
                         ProjectDetail(projects, members, users, activities)
                       }
-                      className="small-box-footer"
+                      className="small-box-footer" style={{background:'#dde2e9'}}
                     >
                       More info <i className="fas fa-arrow-circle-right" />
                     </a>
                   </div>
                 </div>
               </div>
+              <hr />
+              <div class="row">
+                <div class="col-4">
+                  <PieChartDemo />
+                </div>
+                <div class="col-8">
+                  {/* <StackedBarDemo/> */}
+                  <HorizontalBarDemo />
+                </div>
+              </div>
+              <Taksperday />
 
-             
-            {/* Example row of columns */}
-            <div className="card flex justify-content-center" >
-            <div className="row">
-              <div className="col-md-4">
-                <h2>Projects</h2>
-                <p>
-                Project controlling involves overseeing and regulating the various elements of 
-                a project to ensure that it stays on track and within budget. This includes monitoring progress, 
-                identifying risks and issues, and implementing corrective actions as necessary. Controlling also
-                 involves managing resources efficiently to optimize project outcomes while adhering to timelines 
-                 and quality standards.{" "}
-                </p>
-                <p>
-                  <a className="btn btn-secondary" href="#" role="button">
-                    View details »
-                  </a>
-                </p>
-              </div>
-              <div className="col-md-4">
-                <h2>Tracking</h2>
-                <p>
-                involves the systematic monitoring and recording of project activities, milestones, and deliverables.
-                 It provides stakeholders with real-time visibility into project progress, enabling them to make informed
-                  decisions and take timely actions. Tracking encompasses aspects such as task completion, budget utilizat
-                  ion, schedule adherence, and risk mitigation efforts. By tracking key performance indicators (KPIs),
-                   project managers can identify trends, anticipate challenges, and adjust strategies accordingly to keep
-                    the project on course.{" "}
-                </p>
-                <p>
-                  <a className="btn btn-secondary" href="#" role="button">
-                    View details »
-                  </a>
-                </p>
-              </div>
-              <div className="col-md-4">
-                <h2>Performance Cheking </h2>
-                <p>
-                t involves setting clear performance objectives, establishing metrics to measure progress and outcomes,
-                 and providing regular feedback and coaching to improve performance. Performance management also entails
-                  recognizing and rewarding achievement, fostering a culture of accountability and continuous improvement, 
-                  and addressing any performance gaps or issues that may arise.
-                </p>
-                <p>
-                  <a className="btn btn-secondary" href="#" role="button">
-                    View details »
-                  </a>
-                </p>
-              </div>
-            </div>
-            </div>
-            <hr />
-          
-         
-              <Taksperday/>
-            
-  <div class="row">
-    <div class="col-6">
-      <PieChartDemo/>
-    </div>
-    <div class="col-6">
-      <StackedBarDemo/>
-    </div>
-
-</div>
               {/* <Mytimetable /> */}
             </div>
           </section>

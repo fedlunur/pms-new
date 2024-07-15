@@ -64,11 +64,10 @@ export default function DataService() {
       setLoading(false);
     }
   };
-  console.log(" All Datas are " ,allactivities)
-  console.log(" All Projects are " ,allprojects)
+
   // Helper functions to filter or manipulate data
   const activities_by_project = (projectid) => {
-    console.log(" CRUD calling" ,allactivities ," and the id is ",projectid )
+
     const activityList =allactivities.filter(
       (activity) => activity.project_name=== projectid.id
     );
