@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
@@ -11,7 +10,7 @@ import useAxios from "../../utils/useAxios";
 import Checklist from "./Checklist";
 
 import ReactDatePicker from "react-datepicker";
-
+import { Divider, Modal, Select } from "antd";
 
 function MyFormDialog({
   open,
@@ -51,7 +50,9 @@ function MyFormDialog({
         task_name: selectedTask.task_name,
         status: selectedTask.status,
         cover: selectedTask.cover,
-        due_date: selectedTask.due_date ? new Date(selectedTask.due_date) : null,
+        due_date: selectedTask.due_date
+          ? new Date(selectedTask.due_date)
+          : null,
       });
 
       setStartDate(
@@ -76,7 +77,7 @@ function MyFormDialog({
         {
           headers: {
             "Content-Type": "application/json",
-          }
+          },
         }
       );
 
@@ -130,97 +131,103 @@ function MyFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} scroll="paper">
-      <DialogTitle>{selectedTask ? selectedTask.task_name : ""}</DialogTitle>
-      <DialogContent dividers>
-        <div style={{ maxHeight: "550px", overflowY: "auto" }}>
-          <div className="card card-default">
-            <div className="card-body">
-              <div className="row">
-                <div className="col-md-6">
-                  <div className="form-group">
-                    <label>Status</label>
-                    <select
-                      className="form-control select2"
-                      style={{ width: "100%" }}
-                      value={formData.status}
-                      onChange={(e) => handleChange(e)}
-                      name="status"
-                    >
-                      <option value="0">normal</option>
-                      <option value="1">low</option>
-                      <option value="2">high</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="col-md-4">
-                  <div className="form-group">
-                    <label>Legend Color </label>
-                    <ChromePicker
-                      value={formData.cover}
-                      color={cover}
-                      onChange={handleChangeColor}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="row">
-                <div className="col-md-12">
-                  <div className="form-group">
-                    <label>Check List </label>
-                    <Checklist task={selectedTask} />
-                  </div>
+    <Modal
+      title={selectedTask ? selectedTask.task_name : ""}
+      open={open}
+      onOk={handleSubmit}
+      onCancel={handleClose}
+    >
+      <Divider/>
+      <div style={{ maxHeight: "550px", overflowY: "auto" }}>
+        <div className="">
+          <div className="">
+            <div className="">
+              <div className="">
+                <div className="flex flex-col">
+                  <label>Status</label>
+                  <Select
+                    // style={{
+                    //   width: ,
+                    //   height:40
+                    // }}
+                    className="w-full"
+                    size="large"
+                    value={formData.status}
+                    onChange={(e) => handleChange(e)}
+                    options={[
+                      {
+                        value: "0",
+                        label: "Normal",
+                      },
+                      {
+                        value: "1",
+                        label: "Low",
+                      },
+                      {
+                        value: "2",
+                        label: "High",
+                      },
+                    ]}
+                  />
                 </div>
               </div>
+              
+            </div>
 
-              <div className="row">
-                <div className="col-12">
-                  <div className="form-group">
-                    <label>Assign Task To</label>
-                    <CustomMultiselect
-                      options={allusers ? allusers.map((user) => ({
-                        value: user.id,
-                        label: user.first_name || "",
-                      })) : []}
-                      selectedValues={assignedtaskmembers ? assignedtaskmembers.map((user) => ({
-                        value: user.assigned_to_id,
-                        label: user.assigned_to_first_name || "",
-                      })) : []}
-                      onSelect={onSelect}
-                      onRemove={onRemove}
-                      displayValue="label"
-                    />
-                  </div>
+            {/* <div className="">
+              <div className="">
+                <div className="">
+                  <label>Check List </label>
+                  <Checklist task={selectedTask} />
                 </div>
               </div>
+            </div> */}
 
-              <div className="row">
-                <div className="col-12">
-                  <label>Due Date</label>
-                  <div className="card flex justify-content-center">
-                   
-                    <ReactDatePicker
-                      selected={startDate}
-                      onChange={handleDateChange}
-                      dateFormat="yyyy/MM/dd"
-                    />
-                  </div>
+            <div className="row">
+              <div className="col-12">
+                <div className="form-group">
+                  <label>Assign Task To</label>
+                  <CustomMultiselect
+                    options={
+                      allusers
+                        ? allusers.map((user) => ({
+                            value: user.id,
+                            label: user.first_name || "",
+                          }))
+                        : []
+                    }
+                    selectedValues={
+                      assignedtaskmembers
+                        ? assignedtaskmembers.map((user) => ({
+                            value: user.assigned_to_id,
+                            label: user.assigned_to_first_name || "",
+                          }))
+                        : []
+                    }
+                    onSelect={onSelect}
+                    onRemove={onRemove}
+                    displayValue="label"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col-12">
+                <label>Due Date</label>
+                <div className="card flex justify-content-center">
+                  <ReactDatePicker
+                    selected={startDate}
+                    onChange={handleDateChange}
+                    dateFormat="yyyy/MM/dd"
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="primary">
-          Cancel
-        </Button>
-        <Button onClick={handleSubmit} color="primary">
-          Submit
-        </Button>
-      </DialogActions>
-    </Dialog>
+      </div>
+    </Modal>
   );
 }
 

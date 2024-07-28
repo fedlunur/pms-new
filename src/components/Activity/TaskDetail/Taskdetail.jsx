@@ -17,7 +17,8 @@ import { Calendar } from 'primereact/calendar';
 import { MultiSelect } from 'primereact/multiselect';
 import { Slider } from 'primereact/slider';
 import { Tag } from 'primereact/tag';
-
+import { SearchOutlined } from '@ant-design/icons';
+import { Button, Flex, Tooltip } from 'antd';
 import {
   Avatar,
   Dialog,
@@ -25,8 +26,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Button,
+
 } from "@material-ui/core";
+import TaskDrower from "./Drawer";
+import { Task } from "@mui/icons-material";
 function Taskdetail() {
 
   const [projects, setProjects] = useState([]);
@@ -34,12 +37,13 @@ function Taskdetail() {
   const [tasks, setTasks] = useState([]);
   const [taskmembers, setTaskmembers] = useState([]);
   const [taskchecklist,setTaskchecklist]=useState([])
+
   const [users, setUsers] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [filters, setFilters] = useState(null);
   const [loading, setLoading] = useState(false); 
   const api = useAxios();
-  const history = useHistory();
+
 
   useEffect(() => {
     fetchData();
@@ -147,7 +151,13 @@ const initFilters = () => {
   
   const statusBodyTemplate = (rowData) => {
     const status = statuses.find(option => option.value === rowData.status);
-    return status ? <Tag value={status.label} severity={getSeverity(rowData.status)} /> : <p>Unknown</p>; // Handle missing statuses gracefully
+    return status ?
+    
+    <div><Tag value={status.label} severity={getSeverity(rowData.status)} /> <TaskDrower subtasks={taskchecklist.filter((taskm) => taskm.task === rowData.id)}/></div> : <p>Unknown</p>   
+   
+    
+    ; // Handle missing statuses gracefully
+    <TaskDrower/>
   };
   const getActivityName = (rowData) => {
     // Find the matching activity object based on activity ID (assuming a foreign key)
@@ -247,7 +257,11 @@ const initFilters = () => {
         <ProgressBar value={completedPercentage} showValue={true} style={{ height: '10px', backgroundColor: '#d4edda' }}></ProgressBar>
         <br></br>
         <ProgressBar value={incompletePercentage} showValue={true} style={{ height: '10px', backgroundColor: '#f8d7da' }}></ProgressBar>
+        <br></br>
+
+       
       </div>
+     
     );
 };
   const renderHeader = () => {
@@ -263,7 +277,8 @@ const initFilters = () => {
 };
 const header = renderHeader();
   const statusItemTemplate = (option) => {
-    return <span>{option.label}</span>; // Display label directly in filter options
+    return <div> <span>{option.label}</span> 
+   </div>; // Display label directly in filter options
   };
   const teammemberTemplate = (rowData) => {
     return (<div style={{ display: "flex", gap: "8px" }}>
@@ -284,15 +299,15 @@ const header = renderHeader();
   
   return (
     <Layout>
-      <div class="content-wrapper">
-      <section className="content">
-            <div className="container-fluid py-5 px-5">
+      <div class="">
+      <section className="">
+            <div className="py-5 px-5">
    
        
-        <div className="content">
-          <div className="container-fluid">
-            <section className="content">
-              <div className="container-fluid">
+        <div className="">
+          <div className="">
+            <section className="">
+              <div className="">
                 {/* Info boxes */}
                 <div className="row">
                   <div className="col-12 col-sm-6 col-md-3">
@@ -377,7 +392,7 @@ const header = renderHeader();
                       href="javascript:void(0)"
                       className="btn btn-sm btn-info float-left"
                     >
-                      Detail Table
+                     Task Detail Table
                     </a>
                     <div className="card-tools">
                       <button
@@ -427,6 +442,8 @@ const header = renderHeader();
 
           {/* Add more columns as needed based on your Task model fields */}
           <Column field="status" header="Status" sortable style={{ minWidth: '12rem' }} body={statusBodyTemplate} filter filterElement={statusFilterTemplate} />
+         
+         
           {/* Consider adding a custom renderer for the status column to display human-readable labels */}
         </DataTable>
       )}

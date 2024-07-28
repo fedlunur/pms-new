@@ -1,35 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Card } from 'primereact/card';
-import { Button } from 'primereact/button';
-import IssueCard from './IssueCard';
-import NewIssueForm from './NewIssueForm';
+import React, { useState, useEffect } from "react";
+import { Button } from "antd";
+import IssueCard from "./IssueCard";
+import NewIssueForm from "./NewIssueForm";
 import useAxios from "../../utils/useAxios";
-import { Panel } from 'primereact/panel';
 
-function IssuePage() {
-  const { taskId } = useParams();
+function IssuePage({ task }) {
+  const taskId = task.id;
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const api = useAxios();
 
-  useEffect(() => {
-    fetchData();
-  }, [taskId]);
+  const api = useAxios();
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/issues/?task=${taskId}`);
-      setIssues(response.data);
+      const response = await api.get(`/issues/`);
+      setIssues(Array.isArray(response.data) ? response.data : []);
       setLoading(false);
     } catch (error) {
-      setError(error.message || 'An error occurred');
+      setError(error.message || "An error occurred");
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const addIssue = (newIssue) => {
     setIssues([...issues, newIssue]);
@@ -39,22 +37,44 @@ function IssuePage() {
     setShowForm(!showForm);
   };
 
+  const handleReplySubmit = async (issueId, replyText, setReplies) => {
+    try {
+      const response = await api.post("/issue-replies/", {
+        issue: issueId,
+        reply_text: replyText,
+      });
+      setReplies((prevReplies) => [...prevReplies, response.data]);
+    } catch (error) {
+      console.error("Error adding reply:", error);
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="p-d-flex p-flex-column p-jc-center p-ai-center">
-
-      <h1 >Issues for Task {taskId}</h1>
-      <div className="p-d-flex p-jc-center p-mb-4">
-        <Button onClick={toggleFormVisibility} label="New Issue" className="p-button-raised p-button-text" />
-      </div>
-      {showForm && <NewIssueForm addIssue={addIssue} taskId={taskId} toggleForm={toggleFormVisibility} />}
-      <div className="p-d-flex p-flex-wrap p-jc-center">
-        {issues.map(issue => (
-          <IssueCard key={issue.id} issue={issue} />
+    <div style={{ padding: "20px", position: "relative", minHeight: "100vh" }} className="w-full">
+      <h1>Issues for Task {taskId}</h1>
+      
+      <div className="flex flex-col gap-3">
+        {issues.map((issue) => (
+          <IssueCard
+            key={issue.id}
+            issue={issue}
+            onReplySubmit={handleReplySubmit}
+          />
         ))}
       </div>
+      {/* <Button onClick={toggleFormVisibility} type="primary" style={{ marginBottom: "20px" }}>
+        New Issue
+      </Button> */}
+      {/* {showForm && ( */}
+        <NewIssueForm
+          addIssue={addIssue}
+          taskId={taskId}
+          toggleForm={toggleFormVisibility}
+        />
+      {/* )} */}
     </div>
   );
 }

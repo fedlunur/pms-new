@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button } from 'primereact/button';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { Fieldset } from 'primereact/fieldset';
+import { Button, Input, Collapse } from 'antd';
 import useAxios from "../../utils/useAxios";
+
+const { TextArea } = Input;
+const { Panel } = Collapse;
 
 function IssueDetail() {
   const { id: issueId } = useParams();
@@ -33,8 +34,7 @@ function IssueDetail() {
         issue: issueId,
         reply_text: replyText,
       });
-      const newReply = response.data;
-      setReplies([...replies, newReply]);
+      setReplies([...replies, response.data]);
       setReplyText('');
     } catch (error) {
       console.error('Error adding reply:', error);
@@ -42,27 +42,29 @@ function IssueDetail() {
   };
 
   return (
-    <div>
+    <div style={{ padding: '20px' }}>
       {issue && (
-        <Fieldset legend={<legend style={{ textAlign: 'center' }}>{issue.title} <br /><small>{issue.description}</small></legend>}>
-          {replies.map(reply => (
-            <div key={reply.id} className={reply.user.username === issue.user ? 'reply left' : 'reply right'}>
-              <p><b>Comment:</b>  {reply.reply_text}</p>
-              <small><p><b>User:</b> {reply.user.username} </p></small>
-            </div>
-          ))}
-          <form onSubmit={handleSubmitReply}>
-            <InputTextarea
-              rows={5}
-              cols={30}
-              placeholder="Write your reply here..."
-              value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              required
-            />
-            <Button label="Submit" type="submit" className="p-button-success" />
-          </form>
-        </Fieldset>
+        <Collapse defaultActiveKey={['1']}>
+          <Panel header={`${issue.title} - ${issue.description}`} key="1">
+            {replies.map(reply => (
+              <div key={reply.id} style={{ marginBottom: '10px' }}>
+                <b>User:</b> {reply.user.username} <br />
+                <b>Comment:</b> {reply.reply_text}
+              </div>
+            ))}
+            <form onSubmit={handleSubmitReply} style={{ marginTop: '20px' }}>
+              <TextArea
+                rows={4}
+                placeholder="Write your reply here..."
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                required
+                style={{ marginBottom: '10px' }}
+              />
+              <Button type="primary" htmlType="submit">Submit</Button>
+            </form>
+          </Panel>
+        </Collapse>
       )}
     </div>
   );

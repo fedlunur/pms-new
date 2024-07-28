@@ -32,6 +32,7 @@ import 'primeicons/primeicons.css';
 import TaskAttachmentList from "./components/FileManagment/TaskAttachmentList";
 
 import Taksperday from "./components/Reports/Taskperday";
+import ProjectDetails from "./components/ProjectDetails";
 
 function App() {
   return (
@@ -44,6 +45,11 @@ function App() {
           <PrivateRoute
             component={ProjectsDashboard}
             path="/projectsDashboard"
+            exact
+          />
+          <PrivateRoute
+            component={ProjectDetails}
+            path="/projectdetails"
             exact
           />
 

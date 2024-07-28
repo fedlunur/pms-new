@@ -11,11 +11,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import useAxios from "../../utils/useAxios";
 import axios from "axios"; // Import Axios
+import { MdDeleteOutline } from "react-icons/md";
+import { Input } from "antd";
 
 function Checklist({ task }) {
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState("");
   const api = useAxios(); // Correctly defining the api variable here
+  console.log(task,"taskssjhhf")
 
   useEffect(() => {
     const fetchChecklistItems = async () => {
@@ -29,7 +32,8 @@ function Checklist({ task }) {
     };
 
     fetchChecklistItems();
-  }, []);
+  }, [task.id,api]);
+  console.log(items,"items in checklist")
   const handleAddItem = async () => {
     if (newItem.trim() === "") return;
     try {
@@ -72,21 +76,21 @@ function Checklist({ task }) {
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <TextField
-          label="Add Item"
+      <div style={{ display: "flex", alignItems: "center" }} className="gap-1">
+        <Input
+          size="medium"
+          placeholder="Enter Checklist"
           value={newItem}
           onChange={(e) => setNewItem(e.target.value)}
-          fullWidth
-          sx={{ marginBottom: 1 }}
         />
-        <IconButton onClick={handleAddItem} color="primary">
-          <AddIcon />
+       
+        <IconButton onClick={handleAddItem} className="">
+          <AddIcon size={14} color="white" className="bg-black py-1"/>
         </IconButton>
       </div>
-      <List sx={{ width: "100%", maxWidth: 360 }}>
+      <List sx={{ width: "100%"}}>
         {items.map((item) => (
-          <ListItem key={item.id} disablePadding divider>
+          <ListItem key={item.id} disablePadding divider className ='text-xs'>
             <ListItemButton dense>
               <ListItemIcon sx={{ minWidth: "auto" }}>
                 <Checkbox
@@ -95,6 +99,7 @@ function Checklist({ task }) {
                   disableRipple
                   sx={{ padding: 0.5 }}
                   onClick={handleToggle(item.id)}
+                  className="text-gray-800"
                 />
               </ListItemIcon>
               <ListItemText
@@ -107,8 +112,8 @@ function Checklist({ task }) {
                   textDecoration: item.status ? "line-through" : "none",
                 }}
               />
-              <IconButton onClick={handleDeleteItem(item)} color="secondary">
-                <DeleteIcon />
+              <IconButton onClick={handleDeleteItem(item)} >
+              <MdDeleteOutline className="text-gray-800" size={16} />
               </IconButton>
             </ListItemButton>
           </ListItem>

@@ -1,182 +1,192 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../views/Layout";
-import useAxios from "../utils/useAxios";
 import { useHistory } from "react-router-dom";
-import { classNames } from 'primereact/utils';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { InputText } from 'primereact/inputtext';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
-import { Dropdown } from 'primereact/dropdown';
-import { InputNumber } from 'primereact/inputnumber';
-
-import { ProgressBar } from 'primereact/progressbar';
-import { Calendar } from 'primereact/calendar';
-import { MultiSelect } from 'primereact/multiselect';
-import { Slider } from 'primereact/slider';
-import { Tag } from 'primereact/tag';
-
-import { useLocation } from "react-router-dom";
 import {
   Avatar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-} from "@material-ui/core";
+  Card,
+  Col,
+  Divider,
+  Progress,
+  Row,
+  Tooltip,
+  Typography,
+} from "antd";
+import { FaEye } from "react-icons/fa";
 
-function DatatableProjects({ projects,
+function DatatableProjects({
+  projects,
   teammembers,
   users,
-  activities,tasks }) {
-  
-
-  
-
-
+  activities,
+  tasks,
+}) {
+  const history = useHistory();
+  const [tasksForProject, setTasksForProject] = useState([]);
 
   const teammemberTemplate = (rowData) => {
-    return (<div style={{ display: "flex", gap: "8px" }}>
-    {teammembers
-      .filter((member) => member.team.id === rowData.id)
-      .map((member) => (
-        <div key={member.id} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Avatar
-            onClick={() => console.log(member.id)}
-            src={"https://joesch.moe/api/v1/random?key=" + member.id}
-            style={{ cursor: "pointer" }}
-          />
-          <span>{member.user.first_name}</span>
-        </div>
-      ))}
-  </div>)// Handle missing statuses gracefully
-  };
-
-
-  const totalTaskTemplate = ( rowData ) => {
+    const members = teammembers.filter(
+      (member) => member.team.id === rowData.id
+    );
   
-  console.log("For the project  ======> ",rowData)
-    // Filter activities based on project association (assuming 'project_id' is the property on activity)
-    const activityList = activities.filter((activity) => activity.project_name === rowData.id);
-  console.log("The actvities List => ",activityList)
-    // Filter tasks based on activity association (assuming 'activity_id' is the property on task)
-    const tasklist= tasks.filter((task) => activityList.some((activity) => activity.id === task.activity));
-    console.log("The taks  List => ",tasklist)
-    // Calculate the total number of tasks (assuming tasks is an array)
-    const taskCount = tasklist.length;
-  
-    return (
-      <div style={{ display: "flex", gap: "8px" }}>
-        {taskCount}  {/* Display the total task count */}
-      </div>
+    return members.length > 0 ? (
+      <Avatar.Group
+        max={{
+          count: 2,
+          style: {
+            color: "#3b82f6",
+            backgroundColor: "#e0f2ff",
+          },
+        }}
+      >
+        {members.map((member) => (
+          <Tooltip title={member.user.first_name} key={member.id}>
+            <Avatar
+              style={{
+                backgroundColor: "#e0f2ff",
+                color: "#3b82f6",
+                cursor: "pointer",
+              }}
+              onClick={() => console.log(member.id)}
+            >
+              {member.user.first_name.charAt(0)}
+            </Avatar>
+          </Tooltip>
+        ))}
+      </Avatar.Group>
+    ) : (
+      <span>No Team Members</span>
     );
   };
   
+  const totalTaskTemplate = ( rowData ) => {
+  
+    console.log("For the project  ======> ",rowData)
+      // Filter activities based on project association (assuming 'project_id' is the property on activity)
+      const activityList = activities.filter((activity) => activity.project_name === rowData.id);
+    console.log("The actvities List => ",activityList)
+      // Filter tasks based on activity association (assuming 'activity_id' is the property on task)
+      const tasklist= tasks.filter((task) => activityList.some((activity) => activity.id === task.activity));
+      console.log("The taks  List => ",tasklist)
+      // Calculate the total number of tasks (assuming tasks is an array)
+      const taskCount = tasklist.length;
+    
+      return (
+        <div style={{ display: "flex", gap: "8px" }}>
+          {taskCount}  {/* Display the total task count */}
+        </div>
+      );
+    };
 
+  const fetchTasksForProject = (projectId) => {
+    return tasks.filter((task) =>
+      activities.some(
+        (activity) =>
+          activity.id === task.activity && activity.project_name === projectId
+      )
+    );
+  };
 
- 
-  const history = useHistory();
-const projectDetail=(rowData)=>{
-  return (
-    <a
-    onClick={() =>
-      
+  useEffect(() => {
+    const tasksByProject = projects.map((project) => ({
+      projectId: project.id,
+      tasks: fetchTasksForProject(project.id),
+    }));
+    setTasksForProject(tasksByProject);
+  }, [projects, tasks, activities]);
 
-          history.push("/activityboardlist", {
-            projects: rowData,
-            users: users,
-            teammebers: teammembers,
-            activities: activities,
-          })
-      
-      
-      
-    }
-    className="small-box-footer"
-  >
-    More info <i className="fas fa-arrow-circle-right" />
-  </a>
-  );
+  console.log(tasksForProject, "tasksForProject");
 
-}
+  const calculateProgress = (projectId) => {
+    const projectTasks = tasksForProject.find(
+      (p) => p.projectId === projectId
+    )?.tasks;
 
+    const doneTasks = projectTasks?.filter(
+      (task) =>
+        activities.find(
+          (activity) => activity.id === task.activity && activity.list_title === "Done"
+        )
+    ).length;
 
-
+    return projectTasks?.length > 0
+      ? Math.ceil((doneTasks / projectTasks.length) * 100)
+      : 0;
+  };
 
   return (
     <div>
-      <section className="content">
-        {/* Default box */}
- 
-        
-          <div className="card">
-                  <div className="card-header border-transparent">
-                 
-                    <a
-                      href="javascript:void(0)"
-                      className="btn btn-sm btn-info float-left"
-                    >
-                    Projects List
-                    </a>
-                    <div className="card-tools">
-                      <button
-                        type="button"
-                        className="btn btn-tool"
-                        data-card-widget="collapse"
-                      >
-                        <i className="fas fa-minus" />
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-tool"
-                        data-card-widget="remove"
-                      >
-                        <i className="fas fa-times" />
-                      </button>
+      <section className="">
+        <div className="bg-transparent">
+          <div className="bg-transparent border-transparent">
+            <h1 className="font-semibold text-lg text-gray-800 mb-4">
+              Projects
+            </h1>
+            <Row gutter={10}>
+              {projects.map((project) => (
+                <Col span={8} key={project.id}>
+                  <Card>
+                    <div className="flex justify-between items-center mb-4">
+                      <div>
+                        <h1 className="font-semibold text-lg text-gray-800">
+                          {project.project_name}
+                        </h1>
+                        <div className="flex gap-1">
+                          <span className="text-xs text-gray-500">
+                            {totalTaskTemplate(project)}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            Tasks Total
+                          </span>
+                        </div>
+                      </div>
+                      <div className="bg-blue-100 w-6 h-6 flex items-center justify-center cursor-pointer rounded-full">
+                        <FaEye
+                          size={18}
+                          className="text-blue-600"
+                          onClick={() =>
+                            history.push("/activityboardlist", {
+                              projects: project,
+                              users: users,
+                              teammembers: teammembers,
+                              activities: activities,
+                            })
+                          }
+                        />
+                      </div>
                     </div>
-                  </div>
-                  {/* /.card-header */}
-                  <div className="card-body">
-                    <div className="table-responsive">
-
-
-
-
-   
-        <DataTable value={projects} responsiveLayout="stack">
-          <Column field="project_name" header="Project Name" sortable style={{ width: '25%' }} />
-          <Column field="description" header="Description" sortable style={{ width: '50%' }} />
-          {/* <Column field="created_at" body={getProjectNameUsingActivity}  filter  header="Project Name" sortable style={{ width: '25%' }} />
-          <Column field="activity" body={getActivityName} header="Activity"  filterElement={activityFilterTemplate}  filter sortable style={{ width: '25%' }} /> */}
-
-         <Column field="team" body={teammemberTemplate} header="TeamMembers"  style={{ width: '25%' }} /> 
-
-        
-          <Column field="Total tasks" body={totalTaskTemplate}  header="Total taks" sortable style={{ width: '25%' }} />  
-          {/* Add more columns as needed based on your Task model fields */}
-          <Column field="start_date" header="start_date" sortable style={{ minWidth: '12rem' }}  filter  />
-          <Column field="end_date" header="end_date" sortable style={{ minWidth: '12rem' }}  filter  />
-          <Column field="Detail" header="Detail" body={projectDetail}  sortable style={{ minWidth: '12rem' }}  filter  />
-          {/* Consider adding a custom renderer for the status column to display human-readable labels */}
-        </DataTable>
-      
-        
-        
+                    <Divider />
+                    <span className="text-xs text-gray-500">Progress</span>
+                    <Progress
+                      percent={calculateProgress(project.id)}
+                      strokeColor={{ "0%": "#3b82f6", "100%": "#3f51b5" }}
+                    />
+                    <Typography.Paragraph ellipsis={{ rows: 1 }}>
+                      {project.description}
+                    </Typography.Paragraph>
+                    <div className="flex justify-between mt-4">
+                      <div>
+                        <h1 className="text-gray-700">Created at:</h1>
+                        <p className="font-semibold text-gray-900">
+                          {project.start_date}
+                        </p>
+                      </div>
+                      <div>
+                        <h1 className="text-gray-700">Deadline:</h1>
+                        <p className="font-semibold text-gray-900">
+                          {project.end_date}
+                        </p>
+                      </div>
                     </div>
-                    {/* /.table-responsive */}
-                  </div>
-                  {/* /.card-body */}
-                
-                  {/* /.card-footer */}
-                </div>
-              
-          {/* /.card-body */}
-    
-        {/* /.card */}
+                    <Divider />
+                    <div className="flex justify-between items-center">
+                      {teammemberTemplate(project)}
+                    </div>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </div>
+        </div>
       </section>
     </div>
   );

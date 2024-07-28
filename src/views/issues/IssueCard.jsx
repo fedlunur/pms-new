@@ -1,16 +1,47 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Card } from 'primereact/card';
-import { Button } from 'primereact/button';
+import React, { useState } from 'react';
+import { Card, Button, Collapse, Input } from 'antd';
 
-function IssueCard({ issue }) {
+const { TextArea } = Input;
+const { Panel } = Collapse;
+
+function IssueCard({ issue, onReplySubmit }) {
+  const [replies, setReplies] = useState(issue.replies || []);
+  const [replyText, setReplyText] = useState('');
+
+  const handleSubmitReply = (e) => {
+    e.preventDefault();
+    onReplySubmit(issue.id, replyText, setReplies);
+    setReplyText('');
+  };
+
   return (
-    <Card title={issue.title} subTitle={issue.description} style={{ height: '100px', textAlign: 'center',backgrouzndColor: "AppWorkspace" ,margin: '5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-      <div style={{ marginTop: '20px' }}> 
-        <Link to={`/issues/detail/${issue.id}`}>
-          <Button label="View Details" className="p-button-info" style={{display: "flex", marginBottom:"2rem"}} />
-        </Link>
-      </div>
+    <Card
+      title={issue.title}
+      bordered={false}
+      className='w-full text-sm text-left font-regular'
+    >
+      {/* <p>{issue.description}</p> */}
+      <Collapse>
+        <Panel header="Replies" key="1">
+          {replies.map(reply => (
+            <div key={reply.id} style={{ marginBottom: '10px' }}>
+              <b>User:</b> {reply.user.username} <br />
+              <b>Comment:</b> {reply.reply_text}
+            </div>
+          ))}
+          <form onSubmit={handleSubmitReply} style={{ marginTop: '20px' }}>
+            <TextArea
+              rows={2}
+              placeholder="Write your reply here..."
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              required
+              style={{ marginBottom: '10px' }}
+            />
+            <Button type="primary" htmlType="submit">Submit Reply</Button>
+          </form>
+        </Panel>
+      </Collapse>
     </Card>
   );
 }

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import useAxios from "../utils/useAxios";
-import TaskCardList from "../components/TaskCardList";
+import TaskCardList from "./TaskCardList";
 
 function ActivityList({ activity }) {
   const [tasks, setTasks] = useState([]);

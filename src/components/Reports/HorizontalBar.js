@@ -186,6 +186,7 @@ export default function HorizontalBarDemo() {
 
         fetchAndProcessTasks();
     }, [allprojects, allactivities, alltasks]);
+    console.log(chartData)
 
     return (
         <div className="card">

@@ -54,20 +54,9 @@ export default function Header() {
 
   return (
     <div>
-      <nav className="main-header navbar navbar-expand bg-white sticky top-0 dark:bg-[#182235] border-b border-slate-200 dark:border-slate-700 z-30 py-3">
-        <ul className="navbar-nav">
-          <li className="nav-item">
-            <a
-              className="nav-link"
-              data-widget="pushmenu"
-              href="#"
-              role="button"
-            >
-              <i className="fas fa-bars text-indigo-600" />
-            </a>
-          </li>
-        </ul>
-        <ul className="navbar-nav ml-auto">
+      <nav className="w-full flex justify-between bg-white sticky top-0 dark:bg-[#182235] border-b border-slate-200 dark:border-slate-700 z-30 py-3">
+        <div></div>
+        <ul className="flex">
           <li className="nav-item dropdown">
             <a className="nav-link" data-toggle="dropdown" href="#">
               <i className="far fa-bell w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600/80 rounded-full false" />
