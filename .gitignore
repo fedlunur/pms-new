@@ -1,0 +1,13 @@
+node_modules/
+
+# Ignore log files
+*.log
+ README.me
+ backendsystem/venv
+ CDHIPMS/node_modules
+ CDHIPMS/public-old
+ CDHIPMS/src-public-IPconfigured
+ CDHIPMS/README.md
+ CDHIPMS/yarn.lock
+ CDHIPMS/package-lock.json
+ 
