@@ -1,8 +1,6 @@
 node_modules/
-
-# Ignore log files
- backendsystem/venv
- CDHIPMS/node_modules
- CDHIPMS/README.md
- CDHIPMS/yarn.lock
- CDHIPMS/package-lock.json
+backendsystem/venv
+CDHIPMS/node_modules
+CDHIPMS/README.md
+CDHIPMS/yarn.lock
+CDHIPMS/package-lock.json
