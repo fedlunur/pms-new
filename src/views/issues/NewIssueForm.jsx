@@ -5,7 +5,7 @@ import useAxios from "../../utils/useAxios";
 function NewIssueForm({ addIssue, taskId, toggleForm }) {
   const [form] = Form.useForm();
   const api = useAxios();
-
+ console.log(" %%%%%%%     Here is adding to new Issues ",taskId)
   const handleFinish = async (values) => {
     try {
       const response = await api.post('/issues/', {

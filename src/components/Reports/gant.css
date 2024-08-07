@@ -1,0 +1,26 @@
+.gantt-view-mode-day {
+  background-color: #f0f8ff;
+  color: #000;
+}
+
+.gantt-view-mode-week {
+  background-color: #e6f7ff;
+  color: #000;
+}
+
+.gantt-view-mode-month {
+  background-color: #d9f7be;
+  color: #000;
+}
+
+.gantt-view-mode-year {
+  background-color: #f4e0ff;
+  color: #000;
+}
+
+.gantt-view-mode-day:hover,
+.gantt-view-mode-week:hover,
+.gantt-view-mode-month:hover,
+.gantt-view-mode-year:hover {
+  background-color: #b3cde0;
+}

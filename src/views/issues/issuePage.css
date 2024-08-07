@@ -1,0 +1,23 @@
+
+  .commentSection__replyBtn__icon {
+    display: none !important; /* Hide the reply icon */
+  }
+  
+  .commentSection__replyBtn__text {
+    padding-left: 0 !important; /* Adjust padding if needed */
+  }
+  
+  .commentSection__replyBtn {
+    display: flex;
+    align-items: center;
+  }
+  .custom-reply-btn {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    background-color: green !important; /* Added !important to ensure it overrides any existing styles */
+  }
+  
+  .custom-reply-icon {
+    display: none !important; /* Hide the reply icon */
+  }

@@ -323,9 +323,9 @@ const Calendar = () => {
         <div>
 
    
-          <div className="content-wrapper">
-            <div className="content-header">
-              <div className="container-fluid py-5 px-5">
+        <div className="p-1">
+      
+              <div className="container-fluid py-1 px-2">
                 <div className="row mb-2">
                   <div className="col-sm-6">
                     {/* <h1 className="m-0">Scheduler</h1> */}
@@ -438,7 +438,7 @@ const Calendar = () => {
                 </section>
               </div>
             </div>
-          </div>
+      
         </div>
       </Layout>
     </>

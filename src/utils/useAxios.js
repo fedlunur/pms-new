@@ -4,11 +4,13 @@ import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
 import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
+import config from '../config';
 
-const baseURL = "http://127.0.0.1:8000/api";
+
 
 //intercept all request and actualls only to send tothe server
 const useAxios = () => {
+  const baseURL =  config.baseURL;
   const { authTokens, setUser, setAuthTokens } = useContext(AuthContext);
 
   const axiosInstance = axios.create({

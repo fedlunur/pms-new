@@ -1,95 +1,70 @@
-// import logo from "./logo.svg";
-//import routes
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-//pribvate route
-import PrivateRoute from "./utils/PrivateRoute";
-import { AuthProvider } from "./context/AuthContext";
-import "./App.css";
-import Loginpage from "./views/accounts/Loginpage";
-import Registerpage from "./views/accounts/Registerpage";
-import "react-datepicker/dist/react-datepicker.css"; 
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import PrivateRoute from './utils/PrivateRoute';
 
-import TaskList from "./views/TaskList";
+import './App.css';
 
-import ProjectListDT from "./views/ProjectsListDT";
-import DashboardLTE from "./components/DashboardLTE";
-import ProjectsDashboard from "./components/ProjectsDashboard";
-import ActivityBoardList from "./components/Activity/ActivityBoardList";
+// Views and Components
+import Loginpage from './views/accounts/Loginpage';
+import Registerpage from './views/accounts/Registerpage';
+import TaskList from './views/TaskList';
+import ProjectListDT from './views/ProjectsListDT';
+import DashboardLTE from './components/DashboardLTE';
+import ProjectsDashboard from './components/ProjectsDashboard';
+import ActivityBoardList from './components/Activity/ActivityBoardList';
+import Taskdetail from './components/Activity/TaskDetail/Taskdetail';
+import Calendar from './components/Calendar';
 
-import Taskdetail from "./components/Activity/TaskDetail/Taskdetail";
+import IssuePage from './views/issues/IssuePage';
+import IssueDetailPage from './views/issues/IssueDetail';
+import TaskAttachmentList from './components/FileManagment/TaskAttachmentList';
+import Taksperday from './components/Reports/Taskperday';
+import ProjectDetails from './components/ProjectDetails';
+import PasswordChangePage from './views/accounts/passwordchange';
 
-import Calendar from "./components/Calendar";
-import IssuePage from "./views/issues/IssuePage";
-import IssueDetailPage from "./views/issues/IssueDetail";
+// PrimeReact Styles
 import { PrimeReactProvider } from 'primereact/api';
 import 'primereact/resources/primereact.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import 'primereact/resources/themes/saga-blue/theme.css'; // or any other theme
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
-
-import TaskAttachmentList from "./components/FileManagment/TaskAttachmentList";
-
-import Taksperday from "./components/Reports/Taskperday";
-import ProjectDetails from "./components/ProjectDetails";
+import GanttChart from './components/Reports/mygantchart';
+import Mygantchart from './components/Reports/mygantchart';
 
 function App() {
+ 
+
   return (
     <Router>
       <AuthProvider>
-      <PrimeReactProvider>
-        <Switch>
-          {/* private means users need to have access to dashboard */}
-          <PrivateRoute component={DashboardLTE} path="/dashboard" exact />
-          <PrivateRoute
-            component={ProjectsDashboard}
-            path="/projectsDashboard"
-            exact
-          />
-          <PrivateRoute
-            component={ProjectDetails}
-            path="/projectdetails"
-            exact
-          />
+        <PrimeReactProvider>
+          <Switch>
+            <Route path="/login" component={Loginpage} exact />
+            <Route path="/register" component={Registerpage} exact />
+            <Route path="/passwordchange" component={PasswordChangePage} exact />
+            <Route path="/changepassword" component={PasswordChangePage} exact />
 
-          <Route component={Loginpage} path="/" exact/>
-          <Route component={Registerpage} path="/register" exact />
-          {/* <Route component={TodoList} path="/todos" exact /> */}
-          <Route component={ProjectListDT} path="/project" exact />
-
-
-          {/* <Route
-            component={TaskActivitiesTutorial}
-            path="/taskactivitiestutor"
-            exact
-          /> */}
-          <Route component={TaskList} path="/tasklist" exact />
-      
-          <Route
-            component={ActivityBoardList}
-            path="/activityboardlist"
-            exact
-          />
-          <Route 
-          path="/issues/:taskId" 
-          exact 
-          component={IssuePage} 
-        />
-        <Route 
-          path="/issues/detail/:id" 
-          exact 
-          component={IssueDetailPage} 
-        />
-
-          <Route component={Calendar} path="/calendar" exact />
-          <Route component={Taskdetail} path="/taskdt" exact />
-
-          <Route component={TaskAttachmentList} path="/attachments" exact />
-          <Route component={Taksperday} path="/charts" exact />
-          
-       
-        </Switch>
+            <PrivateRoute path="/dashboard" component={DashboardLTE} exact />
+            <PrivateRoute path="/projectsDashboard" component={ProjectsDashboard} exact />
+            <PrivateRoute path="/projectdetails" component={ProjectDetails} exact />
+            <PrivateRoute path="/tasklist" component={TaskList} exact />
+            <PrivateRoute path="/activityboardlist" component={ActivityBoardList} exact />
+            <PrivateRoute path="/issues/:taskId" component={IssuePage} exact />
+            <PrivateRoute path="/issues/detail/:id" component={IssueDetailPage} exact />
+            <PrivateRoute path="/calendar" component={Calendar} exact />
+            <PrivateRoute path="/taskdt" component={Taskdetail} exact />
+            <PrivateRoute path="/attachments" component={TaskAttachmentList} exact />
+            <PrivateRoute path="/charts" component={Taksperday} exact />
+            <PrivateRoute path="/project" component={ProjectListDT} exact />
+            <PrivateRoute component={GanttChart} path="/ganttchart" exact />
+            {/* Default redirect to login */}
+            <Redirect from="/" to="/login" exact />
+            {/* Catch all route to handle non-existent routes */}
+            <Route render={() => <Redirect to="/login" />} />
+          </Switch>
         </PrimeReactProvider>
       </AuthProvider>
     </Router>

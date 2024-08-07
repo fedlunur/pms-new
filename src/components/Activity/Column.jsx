@@ -101,6 +101,7 @@ export default function Column({
   teammeber,
   incomingTasks,
   id,
+  onDeleteActivity
 }) {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState([]);
@@ -122,6 +123,8 @@ export default function Column({
     }
   }, [incomingTasks]);
 
+
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -186,11 +189,7 @@ export default function Column({
     }
   };
 
-  const startEdit = (index) => {
-    setInputValue(tasks[index].task_name);
-    setEditIndex(index);
-  };
-
+ 
   const handleOpen = (selectedtask, taskmembers) => {
     setSelectedTask(selectedtask);
     const taskMemberslist = taskmembers.filter(
@@ -223,11 +222,8 @@ export default function Column({
     }
   };
 
-  function getLocacDate(date) {
-    return date != null ? new Date(date).toLocaleDateString() : "";
-  }
 
-  console.log(tasks);
+  // console.log(tasks);
   function getPriority(priority) {
     if (priority === "0") {
       return { text: "Normal", color: "bg-orange-300 text-orange-500" };
@@ -252,28 +248,24 @@ export default function Column({
 
     const now = new Date();
     const due = new Date(dueDate);
-    const diff = due - now;
+
+    // Calculate the difference in time
+    const diff = due.setHours(0, 0, 0, 0) - now.setHours(0, 0, 0, 0);
+
+    // Calculate the difference in days
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
     if (days < 0) return { text: "Passed", color: "text-red-400 bg-red-50" };
     if (days === 0)
       return { text: "Due today", color: "text-orange-400 bg-orange-50" };
     if (days === 1)
-      return {
-        text: "1 day left",
-        color: "text-orange-400 bg-orange-50",
-      };
+      return { text: "1 day left", color: "text-orange-400 bg-orange-50" };
     if (days === 2)
-      return {
-        text: "2 days left",
-        color: "text-orange-400 bg-orange-50",
-      };
+      return { text: "2 days left", color: "text-orange-400 bg-orange-50" };
 
-    return {
-      text: `${days} days left`,
-      color: "text-gray-400 bg-gray-50",
-    };
+    return { text: `${days} days left`, color: "text-gray-400 bg-gray-50" };
   }
+
   const handleMenuClick = (e, task) => {
     const functions = {
       1: () => handleOpen(task, taskmembers),
@@ -315,7 +307,7 @@ export default function Column({
   };
   const [openIssue, setOpenIssue] = useState(false);
   const IssueOpen = ({ task }) => {
-    console.log(task, "issue Drawer***");
+    // console.log(task, "issue Drawer***");
     return (
       <Drawer
         className="capitalize relative"
@@ -332,7 +324,7 @@ export default function Column({
   };
 
   const showIssueDrawer = (task) => {
-    console.log(task, "show issue task props");
+    // console.log(task, "show issue task props");
     setSelectedTask(task);
     setOpenIssue(true);
   };
@@ -341,7 +333,10 @@ export default function Column({
     setOpenIssue(false);
   };
   const [openDrawer, setOpenDrawer] = useState(false);
-  const DrawerModal = ({ task, taskName, onClose }) => {
+  const DrawerModal = ({  taskName, onClose, taskchecklist }) => {
+  
+    const filteredSubtasks = taskchecklist.filter((taskm) => taskm.task === selectedTask.id);
+    
     return (
       <Drawer
         className="capitalize"
@@ -351,16 +346,18 @@ export default function Column({
         onClose={onClose}
         open={openDrawer}
       >
-        <Checklist task={task} />
+        <Checklist task={selectedTask}   taskchecklist={filteredSubtasks} />
       </Drawer>
     );
   };
 
   const showDrawer = (task) => {
+    setSelectedTask(task)
     setOpenDrawer(true);
   };
 
   const onClose = () => {
+    
     setOpenDrawer(false);
   };
 
@@ -387,23 +384,23 @@ export default function Column({
   };
   useEffect(() => {
     fetchChecklist();
-    console.log("taskchecklist", taskchecklist);
+    
   }, []);
   const activityBodyTemplate = (rowData) => {
     const relatedTasks = taskchecklist.filter(
       (taskm) => taskm.task === rowData.id
     );
-
+  
     // Calculate completed and incomplete tasks
     const completedTasks = relatedTasks.filter((task) => task.status).length;
     const totalTasks = relatedTasks.length;
     const completedPercentage = totalTasks
-      ? (completedTasks / totalTasks) * 100
+      ? Math.round((completedTasks / totalTasks) * 100)
       : 0;
     const incompletePercentage = totalTasks
-      ? ((totalTasks - completedTasks) / totalTasks) * 100
+      ? Math.round(((totalTasks - completedTasks) / totalTasks) * 100)
       : 0;
-
+  
     return (
       <div>
         <Progress
@@ -418,11 +415,12 @@ export default function Column({
       </div>
     );
   };
+  
 
   return (
     <div className="w-full mr-2">
       <div
-        className={`flex justify-between items-center sticky rounded-xl top-0 gap-2 item-center font-bold text-lg text-gray-800 z-20 mb-2 ${
+        className={`flex justify-between items-center sticky rounded-xl top-0 gap-2 item-center font-bold text-lg text-gray-800  mb-2 ${
           title === "To Do"
             ? "bg-blue-200"
             : title === "On Progress"
@@ -445,7 +443,11 @@ export default function Column({
         >
           <h3 className="text-sm text-left text-white">{title}</h3>
         </div>
+        <div className="flex mx-4">
+
         <p className="text-sm text-right px-3 text-blue-500">{tasks.length}</p>
+        <DeleteOutlined className="cursor-pointer text-blue-500" onClick={() => onDeleteActivity(id)}/>
+        </div>
       </div>
       <div className="bg-transparent px-1 overflow-y-scroll h-[600px] w-full">
         <MyFormDialog
@@ -544,7 +546,8 @@ export default function Column({
           )}
         </Droppable>
         <DrawerModal
-          task={selectedTask}
+       
+          taskchecklist={taskchecklist}
           taskName={selectedTask?.task_name}
           onClose={onClose}
         />

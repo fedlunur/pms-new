@@ -10,6 +10,12 @@ import useAxios from "../../utils/useAxios";
 import Checklist from "./Checklist";
 
 import ReactDatePicker from "react-datepicker";
+
+import
+{ DatePicker }
+from
+"antd"
+;
 import { Divider, Modal, Select } from "antd";
 
 function MyFormDialog({
@@ -32,9 +38,7 @@ function MyFormDialog({
     cover: selectedTask ? selectedTask.cover : null,
   });
 
-  const handleChangeColor = (newColor) => {
-    setCover(newColor.hex);
-  };
+
 
   const handleDateChange = (date) => {
     setStartDate(date);
@@ -215,8 +219,8 @@ function MyFormDialog({
             <div className="row">
               <div className="col-12">
                 <label>Due Date</label>
-                <div className="card flex justify-content-center">
-                  <ReactDatePicker
+                <div >
+                  <DatePicker 
                     selected={startDate}
                     onChange={handleDateChange}
                     dateFormat="yyyy/MM/dd"

@@ -1,6 +1,6 @@
 import "../../index.css";
 import ReactDOM from "react-dom";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { classNames } from "primereact/utils";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -25,6 +25,8 @@ import IconButton from '@material-ui/core/IconButton';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import { BiPencil, BiTrash } from "react-icons/bi";
 import axios from "axios";
+import useRole from "../useRole";
+import AuthContext from "../../context/AuthContext";
 
 function   extractFilenameFromURLS  (url)  {
     // Create a URL object from the provided URL string
@@ -47,6 +49,11 @@ function TaskAttachmentList() {
     path: "",
     task_card: null
   };
+  const { hasAccess: canEdit, roles, user } = useRole(['admin', 'QualityAssurance']);
+  const { hasAccess: canAdd } = useRole(['admin','QualityAssurance','member']);
+  const { hasAccess: canDelete } = useRole(['admin']);
+  const { hasAccess: canView } = useRole(['member']);
+
 
   const [attachments, setAttachments] = useState([]);
   const [attachmentDialog, setAttachmentDialog] = useState(false);
@@ -287,6 +294,7 @@ useEffect(() => {
           className="p-button-success mr-2"
           onClick={openNew}
         />
+          {canDelete && 
         <Button
           label="Delete"
           icon="pi pi-trash"
@@ -294,6 +302,7 @@ useEffect(() => {
           onClick={confirmDeleteSelected}
           disabled={!selectedAttachments || !selectedAttachments.length}
         />
+      }
       </React.Fragment>
     );
   };
@@ -327,10 +336,11 @@ useEffect(() => {
          <IconButton  onClick={() => editAttachment(rowData)} >
         <BiPencil />
     </IconButton>
+    {canDelete &&
     <IconButton onClick={() => confirmDeleteAttachment(rowData)} >
         <BiTrash />
     </IconButton>
-      
+  }
       </React.Fragment>
     );
   };
@@ -472,9 +482,10 @@ const taskBody = (rowData) => {
   return (
 
     <Layout>
-    <div class="content-wrapper" style={{ minHeight: '806px' }}>
-      <section className="content">
-            <div className="container-fluid py-5 px-5">
+         <div class="">
+    
+      <section className="">
+            <div className="container-fluid py-2 px-2">
     <div className="datatable-crud-demo">
       <Toast ref={toast} />
 

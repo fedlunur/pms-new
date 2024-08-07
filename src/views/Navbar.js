@@ -97,7 +97,7 @@ function Navbar() {
                       onClick={logoutUser}
                       style={{ cursor: "pointer" }}
                     >
-                      Logout
+                      Logout 
                     </a>
                   </li>
                 </>

@@ -14,26 +14,24 @@ import axios from "axios"; // Import Axios
 import { MdDeleteOutline } from "react-icons/md";
 import { Input } from "antd";
 
-function Checklist({ task }) {
+function Checklist({ task,taskchecklist }) {
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState("");
   const api = useAxios(); // Correctly defining the api variable here
-  console.log(task,"taskssjhhf")
-
+  console.log(taskchecklist  ,"######  taskssjhhf")
+  console.log(items  ,"######  taskssjhhf")
   useEffect(() => {
     const fetchChecklistItems = async () => {
       try {
-        const response = await api.get(`/taskchecklist/?task=${task.id}`);
-        console.log("The data based hgads asdd ====> " + response.data.length);
-        setItems(response.data);
+       setItems(taskchecklist)
       } catch (error) {
         console.error("Error fetching checklist items:", error);
       }
     };
 
     fetchChecklistItems();
-  }, [task.id,api]);
-  console.log(items,"items in checklist")
+  }, []);
+
   const handleAddItem = async () => {
     if (newItem.trim() === "") return;
     try {
@@ -89,7 +87,7 @@ function Checklist({ task }) {
         </IconButton>
       </div>
       <List sx={{ width: "100%"}}>
-        {items.map((item) => (
+        {items && items.map((item) => (
           <ListItem key={item.id} disablePadding divider className ='text-xs'>
             <ListItemButton dense>
               <ListItemIcon sx={{ minWidth: "auto" }}>

@@ -16,7 +16,7 @@ function IssueCard({ issue, onReplySubmit }) {
 
   return (
     <Card
-      title={issue.title}
+      title={issue.title} 
       bordered={false}
       className='w-full text-sm text-left font-regular'
     >

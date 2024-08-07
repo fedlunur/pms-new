@@ -9,11 +9,11 @@ function TaskList() {
   const api = useAxios();
   useEffect(() => {
     const fetchActivities = async () => {
-      console.log("here is the data ===>  ");
+   
       try {
         const response = await api.get("/activitylist/");
         setActivities(response.data);
-        console.log("here is the data ===>  " + response.data);
+     
       } catch (error) {
         console.error("Error fetching activities:", error);
       }

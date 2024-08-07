@@ -17,20 +17,24 @@ import { RiTeamFill } from "react-icons/ri";
 import { FaUser } from "react-icons/fa";
 import PieChart from "./Reports/PieGraph";
 import BarGraph from "./Reports/BarGraph";
+
 import PieGraph from "./Reports/PieGraph";
 import ProjectDashboardCard from "./ProjectDashboardCard";
+import TasksBar from "./Reports/TasksBar";
 export default function DashboardLTE() {
-  const {alltasks} = DataService();
+  const { alltasks } = DataService();
 
   const [projects, setProjects] = useState([]);
   const [completedProjects, setCompletedprojects] = useState([]);
   const [activities, setActivities] = useState([]);
   const [members, setMembers] = useState([]);
   const [users, setUsers] = useState([]);
+  const [issueData, setIssueData] = useState([]);
   const [completedActivities, setCompletedActivities] = useState([]);
   const api = useAxios();
   const history = useHistory();
-  
+
+ 
 
   useEffect(() => {
     fetchData();
@@ -43,11 +47,13 @@ export default function DashboardLTE() {
         activitiesResponse,
         memberResponse,
         userResponse,
+        issueResponse,
       ] = await Promise.all([
         api.get("/project/"),
         api.get("/activitylist/"),
         api.get("/teammembers/"),
         api.get("/users/"),
+        api.get("/comments/"),
       ]);
 
       if (projectsResponse.status < 200 || projectsResponse.status >= 300) {
@@ -58,14 +64,14 @@ export default function DashboardLTE() {
       const activitiesData = activitiesResponse.data;
       const membersData = memberResponse.data;
       const usersData = userResponse.data;
+      const issueData = issueResponse.data;
 
-      console.log(
-        "actvities data are found  ===> yes" + activitiesResponse.data.length
-      );
+
       setProjects(projectsData);
       setActivities(activitiesData);
       setMembers(membersData);
       setUsers(usersData);
+      setIssueData(issueData);
 
       const completedActivities = activitiesData.filter(
         (activity) => activity.status === "completed"
@@ -83,105 +89,13 @@ export default function DashboardLTE() {
       activities: actvivitydata,
     });
   };
+
   return (
     <Layout>
       <div className="">
         <div className="">
           <section className="">
-            {/* <div className="">
-              <div className="">
-                <div className="">
-                  <div className=" bg-white">
-                    <div className="inner">
-                      <h3>{projects.length}</h3>
-                      <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">
-                        Total Projects
-                      </p>
-                    </div>
-                    <div className="icon">
-                      <i className="fas fa-project-diagram text-indigo-600 text-xl" />
-                    </div>
-                    <a
-                      onClick={() =>
-                        ProjectDetail(projects, members, users, activities)
-                      }
-                      className="small-box-footer" style={{background:'#dde2e9'}}
-                    >
-                      More info <i className="fas fa-arrow-circle-right" />
-                    </a>
-                  </div>
-                </div>
-                <div className="col-lg-3 col-6">
-                  <div className="small-box bg-white">
-                    <div className="inner">
-                      <h3>
-                        {activities.length}
-                        <sup style={{ fontSize: 20 }}></sup>
-                      </h3>
-                      <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">
-                        Total Actitvities
-                      </p>
-                    </div>
-                    <div className="icon">
-                      <i className="ion ion-stats-bars text-blue-500" />
-                    </div>
-                    <a href="#" className="small-box-footer" style={{background:'#dde2e9'}}>
-                      More info <i className="fas fa-arrow-circle-right" />
-                    </a>
-                  </div>
-                </div>
-                <div className="col-lg-3 col-6">
-                  <div className="small-box bg-white">
-                    <div className="inner">
-                      <h3>{completedActivities}</h3>
-                      <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">
-                        Completed Activities
-                      </p>
-                    </div>
-                    <div className="icon">
-                      <i className="ion ion-person-add" style={{color:'#a7b4c6'}} />
-                    </div>
-                    <a href="#" className="small-box-footer" style={{background:'#dde2e9'}}>
-                      More info <i className="fas fa-arrow-circle-right" />
-                    </a>
-                  </div>
-                </div>
-                <div className="col-lg-3 col-6">
-                  <div className="small-box bg-white">
-                    <div className="inner">
-                      <h3>{users.length}</h3>
-                      <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">
-                        Total Members
-                      </p>
-                    </div>
-                    <div className="icon">
-                      <i className="fa fa-users text-orange-400" />
-                    </div>
-                    <a
-                      onClick={() =>
-                        ProjectDetail(projects, members, users, activities)
-                      }
-                      className="small-box-footer" style={{background:'#dde2e9'}}
-                    >
-                      More info <i className="fas fa-arrow-circle-right" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <hr />
-              <div class="row">
-                <div class="col-4">
-                  <PieChartDemo />
-                </div>
-                <div class="col-8">
-                  <StackedBarDemo/>
-                  <HorizontalBarDemo />
-                </div>
-              </div>
-              <Taksperday />
-
-              {/* <Mytimetable /> */}
-            {/* </div> */}
+          
 
             <div className="space-y-5 h-full w-full flex flex-col">
               <h1 className="text-lg font-thin ">
@@ -280,10 +194,22 @@ export default function DashboardLTE() {
                   {/* <HorizontalBarDemo /> */}
                 </Col>
                 <Col span={6}>
-                  {/* <ProjectDashboardCard /> */}
-                  <PieChartDemo />
+                  <ProjectDashboardCard />
                 </Col>
                 <Col span={6}></Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <TasksBar />
+                </Col>
+                <Col span={12}>
+                  <PieChartDemo />
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={24}>
+                  {/* <GanttChart tasks={ta} /> */}
+                </Col>
               </Row>
               {/* <PieChart /> */}
               {/* <ProjectStatusChart finished={8} inProgress={2} pending={10} /> */}

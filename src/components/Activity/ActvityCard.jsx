@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom";
 import DataService from "../DataServices";
 import { Col, Row } from "antd";
 
-export default function ActivityCard({ projects }) {
+export default function ActivityCard({ projects, onDeleteActivity }) {
   const [activities, setActivities] = useState([]);
   const [tasks, setTasks] = useState([]);
   const api = useAxios();
@@ -87,16 +87,17 @@ export default function ActivityCard({ projects }) {
           //   // width: "1200px",
           //   margin: "0 auto",
           // }}
-          className="h-full w-full"
+          className="h-full w-full overflow-x-auto flex gap-3"
         >
-          <Row gutter={20}>
+          {/* <Row gutter={20}> */}
           {activities.length > 0 &&
             activities.map((activity) => {
               const tasksForActivity = tasks.filter(
                 (task) => task.activity === activity.id
               );
               return (
-                   <Col span={6}>
+                  //  <Col span={6}>
+                  <div className="w-[280px] gap-3">
                     <Column
                       key={activity.id}
                       title={activity.list_title}
@@ -104,11 +105,13 @@ export default function ActivityCard({ projects }) {
                       teammeber={teammebers}
                       incomingTasks={tasksForActivity}
                       id={activity.id.toString()}
+                      onDeleteActivity={onDeleteActivity}
                     />
-                   </Col>
+                    </div>
+                  //  </Col>
               );
             })}
-            </Row>
+            {/* </Row> */}
         </div>
       </DragDropContext>
     </div>

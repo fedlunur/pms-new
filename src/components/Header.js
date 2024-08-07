@@ -5,13 +5,19 @@ import ThemeToggle from '../components/ThemeToggle';
 import { Dropdown } from "react-bootstrap";
 import useAxios from "../utils/useAxios";
 import moment from "moment";
-
+import { useHistory } from "react-router-dom";
 export default function Header() {
-  const { user, logoutUser } = useContext(AuthContext);
+  const { user,roles, logoutUser } = useContext(AuthContext);
+
   const token = localStorage.getItem("authTokens");
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const api = useAxios();
+  const history = useHistory();
+
+  const changepassword = () => {
+    history.push("/changepassword");
+  };
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -32,6 +38,7 @@ export default function Header() {
     const unread = notifications.filter((n) => !n.read).length;
     setUnreadCount(unread);
   };
+
 
   const markAsRead = async (id) => {
     const readAt = new Date();
@@ -54,7 +61,7 @@ export default function Header() {
 
   return (
     <div>
-      <nav className="w-full flex justify-between bg-white sticky top-0 dark:bg-[#182235] border-b border-slate-200 dark:border-slate-700 z-30 py-3">
+      <nav className="w-full flex justify-between bg-white sticky top-0 dark:bg-[#182235] border-b border-slate-200 dark:border-slate-700 z-20  shadow-md">
         <div></div>
         <ul className="flex">
           <li className="nav-item dropdown">
@@ -63,7 +70,7 @@ export default function Header() {
               <span className="badge badge-warning navbar-badge">{unreadCount}</span>
             </a>
             <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right hover:bg-slate-50 dark:hover:bg-slate-700/">
-              <span className="dropdown-item dropdown-header text-xs font-bold text-slate-400 dark:text-slate-500 uppercase pt-1.5 pb-2 px-3">
+              <span className="dropdown-item dropdown-header text-xs font-bold text-slate-400 dark:text-slate-500 uppercase pt-1.5  px-3">
                 {notifications.length} Notifications
               </span>
               <div className="dropdown-divider" />
@@ -110,7 +117,7 @@ export default function Header() {
             </div>
           </li>
           
-          <li className="nav-item dropdown">
+          <li  className="nav-item dropdown z-50 ">
             <a className="nav-link" data-toggle="dropdown" href="#">
               <div className="user-panel mt-0 pb-3 mb-3 d-flex">
                 <div className="image">
@@ -122,31 +129,38 @@ export default function Header() {
                 </div>
                 <div className="info">
                   <a href="#" className="d-block">
-                    {user && user.username}
+                    {user && user.username  }
                   </a>
                 </div>
               </div>
             </a>
-            <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right z-50">
               <span className="dropdown-item dropdown-header">
-                {user && user.username}
+                {user && user.username  }  | ' '   {roles.join(', ') }
               </span>
               <div className="dropdown-divider" />
-              <a href="#" className="dropdown-item text-indigo-600">
-                <i className="fas fa-user-circle"></i> My Account
+
+            
+
+              <li className="nav-item">
+              <a 
+               
+               onClick={changepassword}
+               style={{ cursor: "pointer" }}
+              href="#" className="dropdown-item">
+                <i className="fas fa-user-circle"></i> Change Password 
               </a>
-              <div className="dropdown-divider" />
-              <a href="#" className="dropdown-item">
+              </li>
                 <li className="nav-item">
                   <a
                     className="nav-link dropdown-item text-indigo-600"
                     onClick={logoutUser}
                     style={{ cursor: "pointer" }}
                   >
-                    <i className="fa fa-sign-out"></i> Logout
+                    <i className="fas fa-sign-out-alt"></i> Logout
                   </a>
                 </li>
-              </a>
+              
               <div className="dropdown-divider" />
             </div>
           </li>

@@ -102,7 +102,7 @@ const ProjectDetails = () => {
                   <Collapse
                     expandIconPosition="end"
                     key={project.id}
-                    className="mb-2 bg-white"
+                    className="mb-2 bg-gray-100"
                     expandIcon={({ isActive }) => (
                       <CaretRightOutlined rotate={isActive ? 90 : 0} />
                     )}
@@ -113,7 +113,8 @@ const ProjectDetails = () => {
                           <Row>
                             <Col span={5}>
                               <p className="font-medium">
-                                {activity.list_title} ({projectTasks.length})
+                                {activity.list_title} ({projectTasks
+                        .filter((task) => task.activity === activity.id).length})
                               </p>
                             </Col>
                           </Row>
