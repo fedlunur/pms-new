@@ -26,18 +26,18 @@ export default function ProjectsDashboard() {
     alltaskmembers,
     allteammembers,
     loading,
-    error,
-    activities_by_project,
-    tasksbyproject,
+  
   } = DataService(); // Assuming useCrud fetches data
-
+ 
   return (
     <Layout>
+    
       <section
         className="w-full  flex flex-col space-y-4"
         style={{ height: "90vh" }}
       >
         <div className=" ">
+          
           <DatatableProjects
             projects={allprojects}
             teammembers={allteammembers}

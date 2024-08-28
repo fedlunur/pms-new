@@ -22,7 +22,7 @@ const Loginpage = () => {
         <section className="vh-100 bg-blue-50 flex items-center justify-center ">
           <div className="border w-max h-max flex bg-white rounded- overflow-hidden shadow-lg">
             <div className="px-10 py-12 w-full space-y-6">
-              <h1 className="font-bold text-3xl ">Welcome Back</h1>
+              <h1 className="font-bold text-3xl ">Welcome to 360- PMS</h1>
               <span className="text-sm w-full text-center">Welcome to your account</span>{" "}
               <div>
                 <label>Email:</label>

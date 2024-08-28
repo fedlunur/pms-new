@@ -33,6 +33,8 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import GanttChart from './components/Reports/mygantchart';
 import Mygantchart from './components/Reports/mygantchart';
+import ProjectResource from './components/FileManagment/projectresource';
+import SchedulerComponent from './components/Calendar';
 
 function App() {
  
@@ -54,12 +56,16 @@ function App() {
             <PrivateRoute path="/activityboardlist" component={ActivityBoardList} exact />
             <PrivateRoute path="/issues/:taskId" component={IssuePage} exact />
             <PrivateRoute path="/issues/detail/:id" component={IssueDetailPage} exact />
-            <PrivateRoute path="/calendar" component={Calendar} exact />
+            <PrivateRoute path="/calendar" component={SchedulerComponent} exact />
             <PrivateRoute path="/taskdt" component={Taskdetail} exact />
             <PrivateRoute path="/attachments" component={TaskAttachmentList} exact />
+
+            <PrivateRoute path="/resources" component={ProjectResource} exact />
+
             <PrivateRoute path="/charts" component={Taksperday} exact />
             <PrivateRoute path="/project" component={ProjectListDT} exact />
             <PrivateRoute component={GanttChart} path="/ganttchart" exact />
+            
             {/* Default redirect to login */}
             <Redirect from="/" to="/login" exact />
             {/* Catch all route to handle non-existent routes */}

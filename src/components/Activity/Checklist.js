@@ -18,8 +18,7 @@ function Checklist({ task,taskchecklist }) {
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState("");
   const api = useAxios(); // Correctly defining the api variable here
-  console.log(taskchecklist  ,"######  taskssjhhf")
-  console.log(items  ,"######  taskssjhhf")
+
   useEffect(() => {
     const fetchChecklistItems = async () => {
       try {

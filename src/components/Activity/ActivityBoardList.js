@@ -2,40 +2,75 @@ import { Modal, Input, Button, message } from "antd";
 import Layout from "../../views/Layout";
 import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import DataService from "../DataServices";
-import useAxios from "../../utils/useAxios";
-import ActivityCard from "./ActvityCard";
 
-export default function ActivityBoardList({}) {
+import useAxios from "../../utils/useAxios";
+import ActivityCard from "./ActvityCard";import dayjs from 'dayjs';
+
+
+import
+{ DatePicker }
+from
+"antd"
+;
+const dateFormat = 'YYYY-MM-DD'; 
+
+export default function ActivityBoardList() {
   const api = useAxios();
   const location = useLocation();
   const projects = location.state && location.state.projects;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [activityInputValue, setActivityInputValue] = useState("");
   const [tasks, setTasks] = useState([]);
   const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const { allactivities, alltasks, activities_by_project,tasksbyproject } = DataService();
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [
+        activitiesResponse,
+        tasksResponse,
+      
+      
+      ] = await Promise.all([
+        
+        api.get(`/activitylist/byproject/${projects.id}/`),// Replace with your activity endpoint
+        api.get("/tasklist/"), // Replace with your task endpoint
+       // Replace with your task member endpoint
+     
 
-  const fetchActivities = async () => {
-    if (projects?.id) {
-      try {
-        const activitiesForProject = activities_by_project(projects);
+      ]);
+      
+      if (activitiesResponse.status < 200 || activitiesResponse.status >= 300) {
+        throw new Error("One or more network responses were not ok");
+      }  
 
-        const tasksForProject = tasksbyproject(projects)
-        setActivities(activitiesForProject);
-        setTasks(tasksForProject);
-      } catch (error) {
-        console.error("Error fetching activities and tasks:", error);
-      }
+     
+      const activitiesData = activitiesResponse.data;
+      const tasksData = tasksResponse.data;
+
+  
+
+   
+      setActivities(activitiesData);
+      setTasks(tasksData);
+     
+     
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchActivities();
-  }, [projects?.id, alltasks]);
+
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -69,11 +104,14 @@ export default function ActivityBoardList({}) {
         if (toDoActivity) {
           const response = await api.post("/tasklist/", {
             task_name: inputValue,
+            start_date:startDate,
+            due_date:endDate,
             activity: toDoActivity.id,
             completed: false,
           });
           setTasks([...tasks, response.data]);
           setInputValue("");
+          fetchData();
         }
       } catch (error) {
         console.error("Error adding task:", error);
@@ -88,22 +126,27 @@ export default function ActivityBoardList({}) {
           project_name: projects.id,
           list_title: activityInputValue,
         });
-        // await fetchActivities(); 
         setActivityInputValue("");
+        fetchData(); // Refetch activities and tasks after adding an activity
       } catch (error) {
         console.error("Error adding activity:", error);
       }
     }
   };
+  const handleDateChangestart  = (dateString) => {
+    
+    setStartDate(dateString)
+
+  };
+  const handleDateChange = (dateString) => {
+ 
+    setEndDate(dateString)
+  };
 
   const deleteActivity = async (activityId) => {
     try {
       await api.delete(`/activitylist/${activityId}/`);
-      // setActivities(
-      //   activities.filter((activity) => activity.id !== activityId)
-      // );
-      // await fetchActivities(); // Fetch new activities and tasks after adding a new activity
-
+      fetchData(); // Refetch activities and tasks after deleting an activity
       message.success("Activity deleted successfully");
     } catch (error) {
       console.error("Error deleting activity:", error);
@@ -137,10 +180,11 @@ export default function ActivityBoardList({}) {
           </div>
         </div>
         <ActivityCard
-          projects={projects}
-          tasks={tasks}
-          activities={activities}
-          onDeleteActivity={deleteActivity}
+      key={`${activities.length}-${tasks.length}`} // Unique key to force re-render
+      projects={projects}
+      tasks={tasks}
+      activities={activities}
+      onDeleteActivity={deleteActivity}
         />
       </div>
 
@@ -150,11 +194,42 @@ export default function ActivityBoardList({}) {
         onOk={handleOk}
         onCancel={handleCancel}
       >
+        <div className="col-12">
+        <div className="row">
         <Input
           placeholder="Task name"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
         />
+        </div>
+        </div>
+          <div className="col-12">
+       <div className="row">
+      <div className="col-6">
+        <label>Start Date</label>
+        <div>
+        <DatePicker
+           
+            value={startDate ? dayjs(startDate, dateFormat) : null}
+            onChange={(date, dateString) => handleDateChangestart (dateString)} 
+     
+            format={dateFormat}
+          />
+        </div>
+      </div>
+      <div className="col-6">
+        <label>End Date  </label>
+        <div>
+          <DatePicker
+            value={endDate ? dayjs(endDate, dateFormat) : null}
+            onChange={(date, dateString) => handleDateChange(dateString)} 
+     
+            format={dateFormat}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
         <Button
           type="primary"
           className="mt-4"
@@ -176,14 +251,7 @@ export default function ActivityBoardList({}) {
           value={activityInputValue}
           onChange={(e) => setActivityInputValue(e.target.value)}
         />
-        <Button
-          type="primary"
-          className="mt-4"
-          onClick={addActivity}
-          disabled={!activityInputValue.trim()}
-        >
-          Create Activity
-        </Button>
+       
       </Modal>
     </Layout>
   );

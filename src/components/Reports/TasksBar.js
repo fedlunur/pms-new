@@ -10,9 +10,9 @@ export default function TasksBar() {
   useEffect(() => {
     const fetchAndProcessIssues = async () => {
       try {
-        const response = await api.get('/issues/');
-        console.log(response.data, "response.data");
-        const issuesData = response.data;
+        const response = await api.get('/comments/');
+     
+        const commentData = response.data;
 
         const issuesByMonth = {};
         const months = [
@@ -24,7 +24,9 @@ export default function TasksBar() {
           issuesByMonth[month] = 0;
         });
 
-        issuesData.forEach((issue) => {
+               
+        commentData.forEach((issue) => {
+          console.log('Error fetching and processing issues',issue)
           const issueMonth = new Date(issue.created_at).toLocaleString('default', {
             month: 'long',
           });

@@ -122,21 +122,21 @@ export default function Header() {
               <div className="user-panel mt-0 pb-3 mb-3 d-flex">
                 <div className="image">
                   <img
-                    src="dist/img/user-avatar-32.png"
+                    src="dist/img/avatar2.png"
                     className="img-circle elevation-2"
                     alt="User Image"
                   />
                 </div>
                 <div className="info">
                   <a href="#" className="d-block">
-                    {user && user.username  }
+                    {user && user.first_name  }
                   </a>
                 </div>
               </div>
             </a>
             <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right z-50">
               <span className="dropdown-item dropdown-header">
-                {user && user.username  }  | ' '   {roles.join(', ') }
+                {user && user.first_name  }   | ' '   {roles.join(', ') }
               </span>
               <div className="dropdown-divider" />
 

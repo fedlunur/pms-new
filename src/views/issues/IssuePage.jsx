@@ -38,7 +38,7 @@ const IssuePage = ({ task }) => {
   };
   const fetchComments = async () => {
     try {
-      const response = await api.get('/comments/');
+      const response = await api.get(`/comments/bytask/${taskId}/`);
       const formattedComments = response.data.map(comment => {
         const userInitials = getInitials(comment.user_data.first_name, comment.user_data.middle_name);
         const avatarUrl = `https://ui-avatars.com/api/?name=${userInitials}&background=random`;

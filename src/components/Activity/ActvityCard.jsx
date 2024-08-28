@@ -26,16 +26,11 @@ export default function ActivityCard({ projects, onDeleteActivity }) {
     // Set activities and tasks based on props or useCrud
     if (projects?.id) {
       setActivities(activitiesForProject);
-    } else {
-      // Handle case where project ID is not available (optional)
-      console.log("Project ID not available for ActivityCard");
-      // Set default values or empty arrays if needed
-    }
+    } 
     setTasks(alltasks); // Assuming alltasks is available from useCrud
   }, [projects?.id, alltasks]); // Re-run useEffect if projects.id changes
 
-  console.log("###The Fetched Activites  are:", activities); // Log activities after fetching
-  console.log("### Fetched taks  already fetched from useCrud", tasks);
+
 
   // Access team members and all users from useCrud (assuming they are returned)
   const teammebers = alltaskmembers;
@@ -48,7 +43,7 @@ export default function ActivityCard({ projects, onDeleteActivity }) {
 
     const taskId = parseInt(draggableId);
     const updatedTask = tasks.find((task) => task.id === taskId);
-    console.log("Draggable task id is " + taskId);
+
     try {
       // Update task activity via API
       const response = await api.put(`/tasklist/${taskId}/`, {
@@ -100,8 +95,9 @@ export default function ActivityCard({ projects, onDeleteActivity }) {
                   <div className="w-[280px] gap-3">
                     <Column
                       key={activity.id}
-                      title={activity.list_title}
+                      title={activity.list_title}                     
                       allusers={allusers}
+                      deletestatus={activity.delete_status}
                       teammeber={teammebers}
                       incomingTasks={tasksForActivity}
                       id={activity.id.toString()}

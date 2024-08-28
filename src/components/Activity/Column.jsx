@@ -8,7 +8,15 @@ import { Link } from "react-router-dom";
 import { CaretRightOutlined } from "@ant-design/icons";
 import { Drawer } from "antd";
 import IssuePage from "../../views/issues/IssuePage";
-
+import {
+  BiCheckDouble,
+  BiRefresh,
+  BiBookAdd,
+  BiEdit,
+  BiTrash,
+  BiCheckCircle,
+  BiReset,
+} from "react-icons/bi";
 import {
   Dialog,
   DialogTitle,
@@ -17,15 +25,7 @@ import {
   DialogActions,
   Button,
 } from "@material-ui/core";
-import {
-  BiCheckDouble,
-  BiRefresh,
-  BiBookAdd,
-  // BiEdit,
-  // BiTrash,
-  // BiCheckCircle,
-  // BiReset,
-} from "react-icons/bi";
+
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const items = [
@@ -98,6 +98,7 @@ function bgcolorChange(props) {
 export default function Column({
   title,
   allusers,
+  deletestatus,
   teammeber,
   incomingTasks,
   id,
@@ -105,11 +106,14 @@ export default function Column({
 }) {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState([]);
+  const [selectedValue, setSelectedValues] = useState([]);
+  
   const [inputValue, setInputValue] = useState("");
   const [editIndex, setEditIndex] = useState(-1);
   const [open, setOpen] = useState(false);
   const [taskmembers, setTaskmembers] = useState([]);
   const [singletaskmembers, setSingletaskmembers] = useState([]);
+  
   //confirmation
   const [taskToDelete, setTaskToDelete] = useState(null); // New state for task to delete
   const [confirmationOpen, setConfirmationOpen] = useState(false);
@@ -131,7 +135,7 @@ export default function Column({
         const taskmemberresponse = await api.get("/taskmembers/");
         setTaskmembers(taskmemberresponse.data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+       
       }
     };
 
@@ -284,7 +288,40 @@ export default function Column({
     onClick: (e) => handleMenuClick(e, task),
     items,
   });
+  const teammemberTemplate = (rowData) => {
+   // const members = assignedtaskmembers.filter(member => member.team.id === rowData.team);
 
+    const members = singletaskmembers
+    console.log("Just did some thing ", members)
+    return members.length > 0 ? (
+      <Avatar.Group
+        max={{
+          count: 2,
+          style: {
+            color: "#3b82f6",
+            backgroundColor: "#e0f2ff",
+          },
+        }}
+      >
+        {members.map(member => (
+          <Tooltip title={member.user.first_name} key={member.id}>
+            <Avatar
+              style={{
+                backgroundColor: "#e0f2ff",
+                color: "#3b82f6",
+                cursor: "pointer",
+              }}
+              onClick={() => console.log(member.id)}
+            >
+              {member.user.first_name.charAt(0)}
+            </Avatar>
+          </Tooltip>
+        ))}
+      </Avatar.Group>
+    ) : (
+      <span>No Team Members</span>
+    );
+  };
   const ConfirmationDialog = ({ open, onClose, onConfirm }) => {
     return (
       <Dialog open={open} onClose={onClose}>
@@ -386,6 +423,27 @@ export default function Column({
     fetchChecklist();
     
   }, []);
+
+
+  
+  const checklistBodyTemplate = (rowData) => {
+    const relatedTasks = taskchecklist.filter(
+      (taskm) => taskm.task === rowData.id
+    );
+  
+    // Calculate completed and incomplete tasks
+    const completedTasks = relatedTasks.filter((task) => task.status).length;
+    const totalTasks = relatedTasks.length;
+  
+  
+    return (
+      <div>
+      {completedTasks} / {totalTasks}
+      </div>
+    );
+  };
+
+
   const activityBodyTemplate = (rowData) => {
     const relatedTasks = taskchecklist.filter(
       (taskm) => taskm.task === rowData.id
@@ -427,7 +485,7 @@ export default function Column({
             ? "bg-orange-200"
             : title === "Done"
             ? "bg-green-200"
-            : "bg-red-200"
+            : "bg-blue-200"
         }`}
       >
         <div
@@ -438,15 +496,15 @@ export default function Column({
               ? "bg-orange-500"
               : title === "Done"
               ? "bg-green-500"
-              : "bg-red-500"
+              : "bg-blue-500"
           }`}
         >
           <h3 className="text-sm text-left text-white">{title}</h3>
         </div>
         <div className="flex mx-4">
 
-        <p className="text-sm text-right px-3 text-blue-500">{tasks.length}</p>
-        <DeleteOutlined className="cursor-pointer text-blue-500" onClick={() => onDeleteActivity(id)}/>
+        <p className="text-sm text-right px-3 text-blue-500">{tasks.length} {deletestatus}</p>
+        {deletestatus && <DeleteOutlined className="cursor-pointer text-blue-500" onClick={() => onDeleteActivity(id)}/>}
         </div>
       </div>
       <div className="bg-transparent px-1 overflow-y-scroll h-[600px] w-full">
@@ -463,88 +521,132 @@ export default function Column({
           onClose={closeConfirmationDialog}
           onConfirm={confirmDeleteTask}
         />
-        <Droppable droppableId={id}>
-          {(provided, snapshot) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              isDraggingOver={snapshot.isDraggingOver}
-              className="p-2 space-y-1 bg-green-50"
-            >
-              {tasks
-                .filter((task) => task.due_date || task.created_at)
-                .map((task, index) => (
-                  <Draggable
-                    draggableId={`${task.id}`}
-                    key={task.id}
-                    index={index}
+    <Droppable droppableId={id}>
+  {(provided, snapshot) => (
+    <div
+      ref={provided.innerRef}
+      {...provided.droppableProps}
+      isDraggingOver={snapshot.isDraggingOver}
+      className="p-2 space-y-1 bg-green-50"
+    >
+      {tasks
+        .filter((task) => task.due_date || task.created_at)
+        .map((task, index) => (
+          <Draggable
+            draggableId={`${task.id}`}
+            key={task.id}
+            index={index}
+            isDragDisabled={!task.movable} // Disable dragging if movable is false
+          >
+            {(provided, snapshot) => {
+              const { text: textPriority, color: colorPriority } =
+                getPriority(task.status);
+              const { color: colorTime, text: textTime } =
+                getRemainingTimeDetails(task.due_date);
+
+              return (
+                <div>
+                  <Card
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    ref={provided.innerRef}
+                    isDragging={snapshot.isDragging}
+                    className="space-y-6 text-gray-800 rounded-xl shadow-lg mb-3"
                   >
-                    {(provided, snapshot) => {
-                      const { text: textPriority, color: colorPriority } =
-                        getPriority(task.status);
-                      const { color: colorTime, text: textTime } =
-                        getRemainingTimeDetails(task.due_date);
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex gap-2">
+                        <Tooltip title={textPriority}>
+                          <div
+                            className={`${colorPriority} w-3 h-3 rounded-full`}
+                          ></div>
+                        </Tooltip>
+                        <CiSquareCheck
+                          className="cursor-pointer"
+                          size={16}
+                          onClick={() => showDrawer(task)}
+                        />
+                      </div>
+                      <Dropdown menu={menuProps(task)}>
+                        <BsThreeDotsVertical className="text-gray-500 cursor-pointer" />
+                      </Dropdown>
+                    </div>
+                    <h1 className="text-sm font-semibold capitalize">
+                      {task.task_name}  
+                      <p>Movable: {task.movable ? 'Yes' : 'No'}</p>
+                    </h1>
 
-                      return (
-                        <div>
-                          <Card
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            ref={provided.innerRef}
-                            isDragging={snapshot.isDragging}
-                            className="space-y-6 text-gray-800 rounded-xl shadow-lg mb-3"
-                          >
-                            <div className="flex justify-between items-center mb-2">
-                              <div className="flex gap-2">
-                                <Tooltip title={textPriority}>
-                                  <div
-                                    className={`${colorPriority} w-3 h-3 rounded-full`}
-                                  ></div>
-                                </Tooltip>
-                                <CiSquareCheck
-                                  className="cursor-pointer"
-                                  size={16}
-                                  onClick={() => showDrawer(task)}
-                                />
+                    <div className="flex flex-col mt-4">
+                    <span className="text-xs flex items-center">
+  Progress
+  <span className="ml-2">{checklistBodyTemplate(task)}</span>
+</span>
+
+                      {activityBodyTemplate(task)}
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span
+                        className="text-xs text-gray-600 cursor-pointer"
+                        onClick={() => showIssueDrawer(task)}
+                      >
+                        Issues 
+                      </span>
+                      <button
+                        className={`py-1 px-3 text-xs rounded-full flex gap-1 ${colorTime}`}
+                      >
+                        <CiClock2 />
+                        {textTime}
+                      
+                      </button>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span
+                        className="text-xs text-gray-600 cursor-pointer"
+                        onClick={() => showIssueDrawer(task)}
+                      >
+                         {/* {teammemberTemplate(task)} */}
+                         <small>
+                            <div className="card-tools">
+                              <div style={{ display: "flex", gap: "8px" }}>
+                                {taskmembers &&
+                                  taskmembers.length > 0 &&
+                                  taskmembers
+                                    .filter(
+                                      (taskm) => taskm.task_id === task.id
+                                    )
+                                    .map((taskMember) => (
+                                      <Avatar
+                                        key={taskMember.id} // Don't forget to add a unique key for each avatar
+                                        onClick={() => console.log(task)}
+                                        src={
+                                          "https://joesch.moe/api/v1/random?key=" +
+                                          taskMember.assigned_to_id
+                                        }
+                                        
+                                        style={{ cursor: "pointer" }} // Add cursor pointer for better UX
+                                      />
+                                    ))}
+                                {/*  */}
                               </div>
-                              <Dropdown menu={menuProps(task)}>
-                                <BsThreeDotsVertical className="text-gray-500 cursor-pointer" />
-                              </Dropdown>
-                            </div>
-                            <h1 className="text-sm font-semibold capitalize">
-                              {task.task_name}
-                            </h1>
 
-                            <div className="flex flex-col mt-4">
-                              <span className="text-xs">Progress</span>
 
-                              {activityBodyTemplate(task)}
+                          
                             </div>
-                            <div className="flex justify-between items-center">
-                              <span
-                                className="text-xs text-gray-600 cursor-pointer"
-                                onClick={() => showIssueDrawer(task)}
-                              >
-                                Issues
-                              </span>
-                              <button
-                                className={`py-1 px-3 text-xs rounded-full flex gap-1 ${colorTime}`}
-                              >
-                                <CiClock2 />
-                                {textTime}
-                              </button>
-                            </div>
-                          </Card>
-                        </div>
-                      );
-                    }}
-                  </Draggable>
-                ))}
+                          </small>
+                      </span>
+                   </div>
+                  </Card>
+                </div>
+              );
+            }}
+          </Draggable>
+        ))}
+      {provided.placeholder}
+    </div>
+  )}
+</Droppable>
 
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
+
         <DrawerModal
        
           taskchecklist={taskchecklist}

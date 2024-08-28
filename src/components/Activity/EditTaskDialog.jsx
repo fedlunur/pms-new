@@ -8,16 +8,12 @@ import CustomMultiselect from "./MultiSelect";
 import { ChromePicker } from "react-color";
 import useAxios from "../../utils/useAxios";
 import Checklist from "./Checklist";
+import { Input,DatePicker,  message } from "antd";
 
-import ReactDatePicker from "react-datepicker";
 
-import
-{ DatePicker }
-from
-"antd"
-;
+import dayjs from 'dayjs';
 import { Divider, Modal, Select } from "antd";
-
+const dateFormat = 'YYYY-MM-DD'; 
 function MyFormDialog({
   open,
   selectedTask,
@@ -27,24 +23,29 @@ function MyFormDialog({
   handleTaskUpdate,
 }) {
   const api = useAxios();
-  const [startDate, setStartDate] = useState(null);
-  const [selectedValues, setSelectedValues] = useState([]);
+ 
   const [cover, setCover] = useState("");
-  const [assignedmember, setAssignedMember] = useState([]);
+
   const [formData, setFormData] = useState({
     task_name: selectedTask ? selectedTask.task_name : "",
     status: selectedTask ? selectedTask.status : "",
     due_date: selectedTask ? selectedTask.due_date : null,
+    start_date: selectedTask ? selectedTask.start_date : null,
     cover: selectedTask ? selectedTask.cover : null,
   });
 
 
 
-  const handleDateChange = (date) => {
-    setStartDate(date);
+  const handleDateChangestart  = (dateString) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      due_date: date,
+      due_date: dateString, // This will now be in YYYY-MM-DD format
+    }));
+  };
+  const handleDateChange = (dateString) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      start_date: dateString, // This will now be in YYYY-MM-DD format
     }));
   };
 
@@ -55,28 +56,37 @@ function MyFormDialog({
         status: selectedTask.status,
         cover: selectedTask.cover,
         due_date: selectedTask.due_date
-          ? new Date(selectedTask.due_date)
-          : null,
+          ,
+        start_date:selectedTask.start_date  
+        
       });
 
-      setStartDate(
-        selectedTask.due_date ? new Date(selectedTask.due_date) : null
-      );
+    
     }
   }, [selectedTask]);
-
+  const handleTaskNameChange = (value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      task_name: value,
+    }));
+  };
   const handleSubmit = async () => {
+    
     try {
-      const formattedDueDate = formData.due_date
-        ? formData.due_date.toISOString().split("T")[0]
-        : null;
-
+      // const formattedDueDate = formData.due_date
+      //   ? formData.due_date.toISOString().split("T")[0]
+      //   : null;
+      //   const formattedstartDate = formData.start_date
+      //   ? formData.start_date.toISOString().split("T")[0]
+      //   : null;
       const response = await api.patch(
         `/tasklist/${selectedTask.id}/`,
         {
           ...formData,
-          due_date: formattedDueDate,
+          // due_date: due_date,
+          // start_date:formattedstartDate,
           cover: cover,
+          
         },
         {
           headers: {
@@ -95,14 +105,13 @@ function MyFormDialog({
       console.error("Error:", error);
     }
   };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleChange = (value, name) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,
     }));
   };
+  
 
   const onSelect = async (selectedList, selectedItem) => {
     if (!selectedItem) return;
@@ -147,45 +156,44 @@ function MyFormDialog({
           <div className="">
             <div className="">
               <div className="">
+              <div className="col-12">
+        <div className="row">
+        <label>Task Name</label>
+        <Input
+          placeholder="Task name"
+          value={formData.task_name}
+          onChange={(e) => handleTaskNameChange(e.target.value)}
+        />
+        </div>
+        </div>
                 <div className="flex flex-col">
                   <label>Status</label>
                   <Select
-                    // style={{
-                    //   width: ,
-                    //   height:40
-                    // }}
-                    className="w-full"
-                    size="large"
-                    value={formData.status}
-                    onChange={(e) => handleChange(e)}
-                    options={[
-                      {
-                        value: "0",
-                        label: "Normal",
-                      },
-                      {
-                        value: "1",
-                        label: "Low",
-                      },
-                      {
-                        value: "2",
-                        label: "High",
-                      },
-                    ]}
-                  />
+  className="w-full"
+  size="large"
+  value={formData.status}
+  onChange={(value) => handleChange(value, "status")}
+  options={[
+    {
+      value: "0",
+      label: "Normal",
+    },
+    {
+      value: "1",
+      label: "Low",
+    },
+    {
+      value: "2",
+      label: "High",
+    },
+  ]}
+/>
                 </div>
               </div>
               
             </div>
 
-            {/* <div className="">
-              <div className="">
-                <div className="">
-                  <label>Check List </label>
-                  <Checklist task={selectedTask} />
-                </div>
-              </div>
-            </div> */}
+      
 
             <div className="row">
               <div className="col-12">
@@ -217,17 +225,35 @@ function MyFormDialog({
             </div>
 
             <div className="row">
-              <div className="col-12">
-                <label>Due Date</label>
-                <div >
-                  <DatePicker 
-                    selected={startDate}
-                    onChange={handleDateChange}
-                    dateFormat="yyyy/MM/dd"
-                  />
-                </div>
-              </div>
-            </div>
+  <div className="col-12">
+    <div className="row">
+      <div className="col-6">
+        <label>Start Date</label>
+        <div>
+        <DatePicker
+           
+            value={formData.start_date ? dayjs(formData.start_date, dateFormat) : null}
+            onChange={(date, dateString) => handleDateChange(dateString)} 
+            needConfirm
+            format={dateFormat}
+          />
+        </div>
+      </div>
+      <div className="col-6">
+        <label>End Date  </label>
+        <div>
+          <DatePicker
+            value={formData.due_date ? dayjs(formData.due_date, dateFormat) : null}
+            onChange={(date, dateString) => handleDateChangestart(dateString)} 
+            needConfirm
+            format={dateFormat}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
           </div>
         </div>
       </div>

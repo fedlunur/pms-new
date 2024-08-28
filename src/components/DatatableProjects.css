@@ -1,0 +1,12 @@
+.custom-carousel .ant-carousel .slick-prev,
+.custom-carousel .ant-carousel .slick-next {
+  top: 20px; /* Adjust this value to position the arrows as needed */
+}
+
+.custom-carousel .ant-carousel .slick-prev {
+  left: 10px; /* Adjust as needed */
+}
+
+.custom-carousel .ant-carousel .slick-next {
+  right: 10px; /* Adjust as needed */
+}

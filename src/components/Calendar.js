@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+
+import React, {useContext ,useState, useEffect, useRef } from "react";
 import { Col, Row, Form, Modal, Button, InputGroup } from "react-bootstrap";
 import Datetime from "react-datetime";
 import { CalendarIcon } from "@heroicons/react/solid";
@@ -12,11 +13,12 @@ import withReactContent from "sweetalert2-react-content";
 import moment from "moment";
 import Layout from "../views/Layout";
 import useAxios from "../utils/useAxios";
+import { Avatar, List } from 'antd';
+import AuthContext from "../context/AuthContext";
+// import useRole from "../useRole";
 import {
   Box,
-  List,
-  ListItem,
-  ListItemText,
+
   Checkbox,
   Typography,
   Dialog,
@@ -35,12 +37,38 @@ const SwalWithBootstrapButtons = withReactContent(
     buttonsStyling: false,
   })
 );
+const filterTodaysEvents = (events) => {
+  const todayStart = moment().startOf('day').toDate();
+  const todayEnd = moment().endOf('day').toDate();
+  
+  return events.filter(event => {
+    const eventStart = new Date(event.start);
+    const eventEnd = new Date(event.end || event.start);
+
+    // Check if the event falls within today
+    const isToday = (eventStart >= todayStart && eventStart <= todayEnd) ||
+                    (eventEnd >= todayStart && eventEnd <= todayEnd) ||
+                    (eventStart <= todayStart && eventEnd >= todayEnd);
+    
+    // Check if the event falls within a different date range, e.g., this week
+    const weekStart = moment().startOf('week').toDate();
+    const weekEnd = moment().endOf('week').toDate();
+    const isThisWeek = (eventStart >= weekStart && eventStart <= weekEnd) ||
+                       (eventEnd >= weekStart && eventEnd <= weekEnd) ||
+                       (eventStart <= weekStart && eventEnd >= weekEnd);
+
+    // Include additional checks here
+    return isToday || isThisWeek;
+  });
+};
+
 
 const EventModal = (props) => {
   const [title, setTitle] = useState(props.title);
   const [start, setStart] = useState(props.start);
   const [end, setEnd] = useState(props.end);
-
+  const [created_by, setCreated_by] = useState(props.created_by);
+ 
   const { show = false, edit = false, id } = props;
   const startDate = start
     ? moment(start).format("YYYY-MM-DD")
@@ -157,13 +185,16 @@ function formatDate(date, formatString = "YYYY-MM-DD") {
 }
 const Calendar = () => {
   const api = useAxios();
-
+ 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const response = await api.get("/events/");
         const fetchedEvents = response.data;
+        console.log("The fetched Data are  %%%%  ",fetchedEvents)
         setEvents(fetchedEvents);
+        const todaysEvents = filterTodaysEvents(fetchedEvents);
+        setCurrentEvents(todaysEvents);
       } catch (error) {
         console.error("Error fetching events:", error);
       }
@@ -171,12 +202,13 @@ const Calendar = () => {
 
     fetchEvents();
   }, []);
-  const defaultModalProps = { id: "", title: "", start: null, end: null };
+  const defaultModalProps = { id: "", title: "", start: null, end: null ,created_by:null };
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalProps, setModalProps] = useState(defaultModalProps);
   const [events, setEvents] = useState([]);
   const [currentEvents, setCurrentEvents] = useState([]);
+  const {user, logoutUser } = useContext(AuthContext);
   const calendarRef = useRef();
   const currentDate = moment().format("YYYY-MM-DD");
 
@@ -190,9 +222,9 @@ const Calendar = () => {
 
   const onEventClick = (props) => {
     const {
-      event: { id, title, start, end },
+      event: { id, title, start, end,created_by },
     } = props;
-    setModalProps({ id, title, start, end });
+    setModalProps({ id, title, start, end,created_by });
     setShowEditModal(true);
   };
 
@@ -216,16 +248,19 @@ const Calendar = () => {
   const onEventAdd = async (props) => {
     const newEvent = {
       ...props,
-      dragable: true,
+      draggable: true,
       className: "bg-blue text-white",
       allDay: true,
+      created_by: user.user_id
     };
     try {
       const response = await api.post("/events/", newEvent);
-
+  
       if (response) {
         setShowAddModal(false);
-        setEvents([...events, newEvent]);
+        const updatedEvents = [...events, newEvent];
+        setEvents(updatedEvents);
+        setCurrentEvents(filterTodaysEvents(updatedEvents));
         setModalProps(defaultModalProps);
         handleClose();
       } else {
@@ -235,6 +270,7 @@ const Calendar = () => {
       console.error("Error creating event:", error);
     }
   };
+  
   const onEventDelete = async function (id) {
     const result = await SwalWithBootstrapButtons.fire({
       icon: "error",
@@ -244,10 +280,10 @@ const Calendar = () => {
       confirmButtonText: "Yes",
       cancelButtonText: "Cancel",
     });
-
+  
     setShowEditModal(false);
     setModalProps(defaultModalProps);
-
+  
     if (result.isConfirmed) {
       await api.delete(`/events/${id}/`);
       SwalWithBootstrapButtons.fire(
@@ -255,9 +291,9 @@ const Calendar = () => {
         "The event has been deleted.",
         "success"
       );
-      const newEvents = events.filter((e) => e.id !== id);
-      setEvents(newEvents);
-      location.reload();
+      const updatedEvents = events.filter((e) => e.id !== id);
+      setEvents(updatedEvents);
+      setCurrentEvents(filterTodaysEvents(updatedEvents));
     }
   };
   const handleEventDrop = async (eventDropInfo) => {
@@ -336,7 +372,7 @@ const Calendar = () => {
                     <div className="row">
                       <div className="col-12">
                         <div className="card">
-                          <div className="card-header" style={{backgroundColor: "#f9fafd"}}>
+                          <div className="card-header" style={{backgroundColor: "##e2fcf5 "}}>
                             <h3
                               className="card-title"
                               style={{
@@ -355,38 +391,39 @@ const Calendar = () => {
                           <div className="card-body">
                             <Box display="flex" justifyContent="space-between">
                               <Box flex="1 1 20%" p="15px" borderRadius="4px">
-                                <Typography variant="h5">Events</Typography>
-                                <List>
-                                  {currentEvents.map((event) => (
-                                    <ListItem
-                                      key={event.id}
-                                      sx={{
-                                        background: "#3788d8",
-                                        color: "#ffffff",
-                                        margin: "10px 0",
-                                        borderRadius: "2px",
-                                      }}
-                                    >
-                                      <ListItemText
-                                        primary={
-                                          <Typography>{event.title}</Typography>
-                                        }
-                                        secondary={
-                                          <Typography>
-                                            {formatDate(event.start, {
-                                              year: "numeric",
-                                              month: "short",
-                                              day: "numeric",
-                                              hour: "",
-                                              minute: "2-digit",
-                                              hour12: true,
-                                            })}
-                                          </Typography>
-                                        }
-                                      />
-                                    </ListItem>
-                                  ))}
-                                </List>
+                                <Typography variant="h5">Today's - Event</Typography>
+                             
+                                <List
+      itemLayout="horizontal"
+      dataSource={currentEvents}
+      renderItem={(event) => (
+        <List.Item>
+    
+
+
+          <List.Item.Meta
+            avatar={
+              <Avatar
+                src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${event.id}`} // Generate a unique avatar for each event
+                style={{ backgroundColor: '#87d068' }} // Optional: Customize avatar background color  created_by {event.created_by_detail?.first_name}
+              />
+            }
+            title={<a href="#">{event.title}  </a>} 
+            
+            description={formatDate(event.start, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "",
+              minute: "2-digit",
+              hour12: true,
+            })}
+          />
+       
+        </List.Item>
+
+      )}
+    />
                               </Box>
 
                               <Box flex="1 1 100%" ml="15px">
@@ -424,7 +461,7 @@ const Calendar = () => {
                                     today: "Today",
                                   }}
                                   eventsSet={(updatedEvents) =>
-                                    setCurrentEvents(updatedEvents)
+                                    setCurrentEvents(filterTodaysEvents(updatedEvents))
                                   }
                                   eventDrop={handleEventDrop}
                                 />

@@ -29,7 +29,7 @@ export default function DashboardLTE() {
   const [activities, setActivities] = useState([]);
   const [members, setMembers] = useState([]);
   const [users, setUsers] = useState([]);
-  const [issueData, setIssueData] = useState([]);
+  const [commentData, setCommentData] = useState([]);
   const [completedActivities, setCompletedActivities] = useState([]);
   const api = useAxios();
   const history = useHistory();
@@ -47,13 +47,13 @@ export default function DashboardLTE() {
         activitiesResponse,
         memberResponse,
         userResponse,
-        issueResponse,
+       // issueResponse,
       ] = await Promise.all([
         api.get("/project/"),
         api.get("/activitylist/"),
         api.get("/teammembers/"),
         api.get("/users/"),
-        api.get("/comments/"),
+       // api.get("/comments/"),
       ]);
 
       if (projectsResponse.status < 200 || projectsResponse.status >= 300) {
@@ -64,14 +64,14 @@ export default function DashboardLTE() {
       const activitiesData = activitiesResponse.data;
       const membersData = memberResponse.data;
       const usersData = userResponse.data;
-      const issueData = issueResponse.data;
+      //const issueData = issueResponse.data;
 
 
       setProjects(projectsData);
       setActivities(activitiesData);
       setMembers(membersData);
       setUsers(usersData);
-      setIssueData(issueData);
+     // setCommentData(issueData);
 
       const completedActivities = activitiesData.filter(
         (activity) => activity.status === "completed"
@@ -81,14 +81,7 @@ export default function DashboardLTE() {
       console.error("Error fetching data:", error);
     }
   };
-  const ProjectDetail = (projects, members, users, actvivitydata) => {
-    history.push("/projectsDashboard", {
-      projects: projects,
-      users: users,
-      teammebers: members,
-      activities: actvivitydata,
-    });
-  };
+
 
   return (
     <Layout>
@@ -98,8 +91,8 @@ export default function DashboardLTE() {
           
 
             <div className="space-y-5 h-full w-full flex flex-col">
-              <h1 className="text-lg font-thin ">
-                Welcome, <span className="font-bold">User 😊</span>
+              <h1 className="text-lg font-thin ">Welcome,
+                {/* Welcome, <span className="font-bold">User 😊</span> */}
               </h1>
               <Row gutter={16}>
                 <Col span={6}>

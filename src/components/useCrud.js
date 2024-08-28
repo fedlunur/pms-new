@@ -7,11 +7,6 @@ export default function useCrud(resourceUrl) {
   const [error, setError] = useState(null);
 
   const api = useAxios();
- 
-
-
-
-
 
   useEffect(() => {
     const fetchData = async () => {
