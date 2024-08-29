@@ -44,9 +44,9 @@ export default function SideMenu() {
             <Menu.Item key="/resources">
               <Link to="/resources">Project Resources</Link>
             </Menu.Item>
-            <Menu.Item key="/attachments">
+            {/* <Menu.Item key="/attachments">
               <Link to="/attachments">Task Resources</Link>
-            </Menu.Item>
+            </Menu.Item> */}
           </SubMenu>
           <Menu.Item key="/projectdetails" icon={<GrProjects />}>
             <Link to="/projectdetails">Project Details</Link>

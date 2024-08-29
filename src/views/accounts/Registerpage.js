@@ -1,13 +1,17 @@
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
-import { Input } from "antd";
 
+import { Input,Alert, Flex, Spin, Switch } from 'antd';
 const Registerpage = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [first_name, setFirstname] = useState("");
+  const [middle_name, setMiddlename] = useState("");
+  const [last_name, setLastname] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { registerUser } = useContext(AuthContext);
 
@@ -17,7 +21,9 @@ const Registerpage = () => {
       alert("Passwords do not match");
       return;
     }
-    registerUser(email, username, password, password2);
+    setLoading(true);
+    await registerUser(first_name, middle_name, last_name, email, password, password2);
+    setLoading(false);
   };
 
   return (
@@ -26,17 +32,49 @@ const Registerpage = () => {
         <div className="px-10 py-12 w-full space-y-6">
           <h1 className="font-bold text-3xl">Create an Account</h1>
           <span className="text-sm w-full text-center">Welcome to your new account</span>
+          {loading ? 
+          <Flex gap="middle" vertical>
+      <Spin spinning={loading}>
+        <Alert
+          type="info"
+          message="User Accout Creation"
+          description="Please wait we are creating your account once created you will be redirected to login."
+        />
+      </Spin>
+    
+    </Flex>:
           <form onSubmit={handleSubmit}>
             <div>
-              <label className="block text-sm">Username:</label>
+              <label className="block text-sm">First Name :</label>
               <Input
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
+                value={first_name}
+                onChange={(e) => setFirstname(e.target.value)}
+                placeholder="First Name"
                 className="w-[400px]"
                 style={{ height: "40px" }}
               />
             </div>
+            <div>
+              <label className="block text-sm">Middle Name:</label>
+              <Input
+                value={middle_name}
+                onChange={(e) => setMiddlename(e.target.value)}
+                placeholder="Middle Name"
+                className="w-[400px]"
+                style={{ height: "40px" }}
+              />
+            </div>
+            <div>
+              <label className="block text-sm">Last Name</label>
+              <Input
+                value={last_name}
+                onChange={(e) => setLastname(e.target.value)}
+                placeholder="Last Name"
+                className="w-[400px]"
+                style={{ height: "40px" }}
+              />
+            </div>
+         
             <div>
               <label className="block text-sm">Email:</label>
               <Input
@@ -75,13 +113,14 @@ const Registerpage = () => {
             >
               Register
             </button>
-          </form>
+          </form> }
           <p className="text-xs text-center">
             Already have an account?{" "}
             <Link to="/login" className="text-blue-500">
               Login
             </Link>
           </p>
+         
         </div>
       </div>
     </section>

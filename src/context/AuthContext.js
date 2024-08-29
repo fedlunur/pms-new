@@ -99,7 +99,8 @@ export const AuthProvider = ({ children }) => {
       });
     }
   };
-  const registerUser = async (email, username, password, password2) => {
+  const registerUser = async (first_name,middle_name,last_name,email, password, password2) => {
+
     try {
       const response = await fetch(`${config.baseURL}/register/`, {
         method: "POST",
@@ -107,8 +108,11 @@ export const AuthProvider = ({ children }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          first_name,
+          middle_name,
+          last_name,
           email,
-          username,
+        
           password,
           password2,
         }),

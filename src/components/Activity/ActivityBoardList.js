@@ -1,17 +1,18 @@
 import { Modal, Input, Button, message } from "antd";
 import Layout from "../../views/Layout";
 import { useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState,useContext, useEffect } from "react";
 
 import useAxios from "../../utils/useAxios";
 import ActivityCard from "./ActvityCard";import dayjs from 'dayjs';
-
-
+import AuthContext from "../../context/AuthContext";
+import useRole from "../useRole";
 import
 { DatePicker }
 from
 "antd"
 ;
+
 const dateFormat = 'YYYY-MM-DD'; 
 
 export default function ActivityBoardList() {
@@ -27,6 +28,12 @@ export default function ActivityBoardList() {
   const [tasks, setTasks] = useState([]);
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { user, logoutUser,roles } = useContext(AuthContext);
+  const { hasAccess: canEdit  } = useRole(['Admin', 'ProjectCoordinator']);
+  const { hasAccess: canAdd } = useRole(['Admin', 'ProjectCoordinator']);
+  const { hasAccess: canDelete } = useRole(['Admin','ProjectCoordinator']);
+  const { hasAccess: canView } = useRole(['Member','Admin','ProjectCoordinator']);
+console.log("canEdit,canAdd,canDelete,canView",canEdit,canAdd,canDelete,canView,roles)
   useEffect(() => {
     fetchData();
   }, []);
@@ -164,20 +171,22 @@ export default function ActivityBoardList() {
           <h1 className="text-lg capitalize text-gray-800 font-semibold">
             {projects?.project_name} Kanban Board
           </h1>
-          <div className="flex gap-2">
+      { canAdd ? <div className="flex gap-2">
             <button
               className="text-white rounded-md bg-blue-500 py-2 px-4"
               onClick={showModal}
+              
             >
               Add Task
             </button>
             <button
               className="rounded-md text-blue-500 border-2 border-blue-500 py-2 px-4"
               onClick={showActivityModal}
+             
             >
               Create Activity
             </button>
-          </div>
+          </div> :null}
         </div>
         <ActivityCard
       key={`${activities.length}-${tasks.length}`} // Unique key to force re-render
@@ -234,7 +243,8 @@ export default function ActivityBoardList() {
           type="primary"
           className="mt-4"
           onClick={addTodo}
-          disabled={!inputValue.trim()}
+          disabled={!inputValue.trim() || ! canAdd }
+   
         >
           Add Task
         </Button>

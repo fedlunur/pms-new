@@ -57,14 +57,11 @@ const ProjectResource = () => {
     remark:""
 
   };
-  const { /* The above code is a multi-line comment in JavaScript. It is used to add comments in the
-  code that are not executed by the JavaScript engine. Comments are helpful for adding
-  explanations, notes, or disabling code temporarily. */
-  user, logoutUser } = useContext(AuthContext);
-  const { hasAccess: canEdit, roles } = useRole(['admin', 'QualityAssurance']);
-  const { hasAccess: canAdd } = useRole(['admin', 'QualityAssurance', 'member']);
-  const { hasAccess: canDelete } = useRole(['admin','QualityAssurance']);
-  const { hasAccess: canView } = useRole(['member','QualityAssurance']);
+  const { user, logoutUser,roles } = useContext(AuthContext);
+  const { hasAccess: canEdit  } = useRole(['Admin', 'ProjectCoordinator']);
+  const { hasAccess: canAdd } = useRole(['Admin', 'ProjectCoordinator']);
+  const { hasAccess: canDelete } = useRole(['Admin','ProjectCoordinator']);
+  const { hasAccess: canView } = useRole(['Member','Admin','ProjectCoordinator']);
 
   const [attachments, setAttachments] = useState([]);
   const [attachmentDialog, setAttachmentDialog] = useState(false);
