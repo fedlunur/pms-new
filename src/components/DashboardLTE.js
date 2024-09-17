@@ -169,19 +169,7 @@ export default function DashboardLTE() {
               </Row>
               <Row gutter={16}>
                 <Col span={18}>
-                  {/* <div className="flex justify-between mb-2">
-                    <div className="flex gap-3">
-                      <button className="py-1 px-3 text-xs border-2 border-blue-500 rounded-sm font-semibold text-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 active:border-blue-600 transition-colors duration-300">
-                        Week
-                      </button>
-                      <button className="py-1 px-3 text-xs border-2 border-blue-500 rounded-sm font-semibold text-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 active:border-blue-600 transition-colors duration-300">
-                        Month
-                      </button>
-                      <button className="py-1 px-3 text-xs border-2 border-blue-500 rounded-sm font-semibold text-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 active:border-blue-600 transition-colors duration-300">
-                        Year
-                      </button>
-                    </div>
-                  </div> */}
+             
 
                   <BarGraph />
                   {/* <HorizontalBarDemo /> */}

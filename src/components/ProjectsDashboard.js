@@ -37,14 +37,16 @@ export default function ProjectsDashboard() {
         style={{ height: "90vh" }}
       >
         <div className=" ">
-          
-          <DatatableProjects
+        {loading ? (
+        <p>Loading projects...</p>
+      ) : 
+          < DatatableProjects
             projects={allprojects}
             teammembers={allteammembers}
             users={alluserss}
             activities={allactivities}
             tasks={alltasks}
-          />
+          />}
         </div>
       </section>
     </Layout>

@@ -408,8 +408,13 @@ const Calendar = () => {
                 style={{ backgroundColor: '#87d068' }} // Optional: Customize avatar background color  created_by {event.created_by_detail?.first_name}
               />
             }
-            title={<a href="#">{event.title}  </a>} 
-            
+            title={
+              <a href="#">
+                {event.title} created by {event.created_by_detail?.first_name } {event.created_by_detail?.last_name}
+                {event.created_by}
+               
+              </a>
+            }
             description={formatDate(event.start, {
               year: "numeric",
               month: "short",

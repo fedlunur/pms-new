@@ -327,23 +327,24 @@ const header = renderHeader();
                     {/* /.info-box */}
                   </div>
                   <div className="col-12 col-sm-6 col-md-3">
-                    <div className="info-box mb-3">
-                      <span className="info-box-icon bg-warning elevation-1">
-                        <i className="fas fa-users" />
-                      </span>
-                      <div className="info-box-content">
-                        <span className="info-box-text">To-Do</span>
-                        <span className="info-box-number">{tasks.filter(task=>task.activity ===4).length}</span>
+  <div className="info-box mb-3">
+    <span className="info-box-icon elevation-1" style={{ backgroundColor: '#00c0ef' }}>
+      <i className="fas fa-users" />
+    </span>
+    <div className="info-box-content">
+      <span className="info-box-text">To-Do</span>
+      <span className="info-box-number">{tasks.filter(task => task.activity === 4).length}</span>
+    </div>
+    {/* /.info-box-content */}
+  </div>
+  {/* /.info-box */}
+</div>
 
-                      </div>
-                      {/* /.info-box-content */}
-                    </div>
-                    {/* /.info-box */}
-                  </div>
+
                   {/* /.col */}
                   <div className="col-12 col-sm-6 col-md-3"> 
                     <div className="info-box mb-3">
-                      <span className="info-box-icon bg-success elevation-1">
+                      <span className="info-box-icon bg-warning elevation-1">
                         <i className="fas fa-shopping-cart" />
                       </span>
                       <div className="info-box-content">
@@ -358,7 +359,7 @@ const header = renderHeader();
                   </div>
                   <div className="col-12 col-sm-6 col-md-3">
                     <div className="info-box mb-3">
-                      <span className="info-box-icon bg-danger elevation-1">
+                      <span className="info-box-icon bg-success elevation-1">
                         <i className="fas fa-thumbs-up" />
                       </span>
                       <div className="info-box-content">

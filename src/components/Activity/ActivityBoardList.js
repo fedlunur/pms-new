@@ -1,91 +1,74 @@
-import { Modal, Input, Button, message } from "antd";
-import Layout from "../../views/Layout";
-import { useLocation } from "react-router-dom";
-import { useState,useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useCallback } from 'react';
+import { Modal, Input, message, Form, DatePicker, Button } from 'antd';
+import Layout from '../../views/Layout';
+import { useLocation } from 'react-router-dom';
+import dayjs from 'dayjs';
+import useAxios from '../../utils/useAxios';
+import ActivityCard from "./ActvityCard";
+import AuthContext from '../../context/AuthContext';
+import useRole from '../useRole';
+import { AntDesignOutlined } from '@ant-design/icons';
 
-import useAxios from "../../utils/useAxios";
-import ActivityCard from "./ActvityCard";import dayjs from 'dayjs';
-import AuthContext from "../../context/AuthContext";
-import useRole from "../useRole";
-import
-{ DatePicker }
-from
-"antd"
-;
-
-const dateFormat = 'YYYY-MM-DD'; 
+const dateFormat = 'YYYY-MM-DD';
 
 export default function ActivityBoardList() {
   const api = useAxios();
   const location = useLocation();
-  const projects = location.state && location.state.projects;
+  const projects = location.state?.projects;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
-  const [inputValue, setInputValue] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [activityInputValue, setActivityInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [activityInputValue, setActivityInputValue] = useState('');
   const [tasks, setTasks] = useState([]);
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { user, logoutUser,roles } = useContext(AuthContext);
-  const { hasAccess: canEdit  } = useRole(['Admin', 'ProjectCoordinator']);
+  const { user, logoutUser, roles } = useContext(AuthContext);
+  const { hasAccess: canEdit } = useRole(['Admin', 'ProjectCoordinator']);
   const { hasAccess: canAdd } = useRole(['Admin', 'ProjectCoordinator']);
-  const { hasAccess: canDelete } = useRole(['Admin','ProjectCoordinator']);
-  const { hasAccess: canView } = useRole(['Member','Admin','ProjectCoordinator']);
-console.log("canEdit,canAdd,canDelete,canView",canEdit,canAdd,canDelete,canView,roles)
+  const { hasAccess: canDelete } = useRole(['Admin', 'ProjectCoordinator']);
+  const { hasAccess: canView } = useRole(['Member', 'Admin', 'ProjectCoordinator']);
+  const { hasAccess: canMove } = useRole(['Member', 'Admin', 'ProjectCoordinator']);
+  const [form] = Form.useForm();
+
+  const permissions = {
+    canEdit,
+    canAdd,
+    canDelete,
+    canView,
+    canMove,
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const [
-        activitiesResponse,
-        tasksResponse,
-      
-      
-      ] = await Promise.all([
-        
-        api.get(`/activitylist/byproject/${projects.id}/`),// Replace with your activity endpoint
-        api.get("/tasklist/"), // Replace with your task endpoint
-       // Replace with your task member endpoint
-     
-
+      const [activitiesResponse, tasksResponse] = await Promise.all([
+        api.get(`/activitylist/byproject/${projects.id}/`),
+        api.get('/tasklist/'),
       ]);
-      
+
       if (activitiesResponse.status < 200 || activitiesResponse.status >= 300) {
-        throw new Error("One or more network responses were not ok");
-      }  
+        throw new Error('One or more network responses were not ok');
+      }
 
-     
-      const activitiesData = activitiesResponse.data;
-      const tasksData = tasksResponse.data;
-
-  
-
-   
-      setActivities(activitiesData);
-      setTasks(tasksData);
-     
-     
+      setActivities(activitiesResponse.data);
+      setTasks(tasksResponse.data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
+      message.error('Failed to fetch data');
     } finally {
       setLoading(false);
     }
-  };
+  }, [api, projects.id]);
 
+  const showModal = () => setIsModalOpen(true);
 
-
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const showActivityModal = () => {
-    setIsActivityModalOpen(true);
-  };
+  const showActivityModal = () => setIsActivityModalOpen(true);
 
   const handleOk = () => {
     addTodo();
@@ -103,151 +86,166 @@ console.log("canEdit,canAdd,canDelete,canView",canEdit,canAdd,canDelete,canView,
   };
 
   const addTodo = async () => {
-    if (inputValue.trim() !== "") {
+    if (inputValue.trim()) {
       try {
-        const toDoActivity = activities.find(
-          (activity) => activity.list_title === "To Do"
-        );
+        const toDoActivity = activities.find((activity) => activity.list_title === 'To Do');
         if (toDoActivity) {
-          const response = await api.post("/tasklist/", {
+          const response = await api.post('/tasklist/', {
             task_name: inputValue,
-            start_date:startDate,
-            due_date:endDate,
+            start_date: startDate,
+            due_date: endDate,
             activity: toDoActivity.id,
             completed: false,
           });
-          setTasks([...tasks, response.data]);
-          setInputValue("");
+          setTasks((prevTasks) => [...prevTasks, response.data]);
+          setInputValue('');
           fetchData();
         }
       } catch (error) {
-        console.error("Error adding task:", error);
+        console.error('Error adding task:', error);
+        message.error('Failed to add task');
       }
     }
   };
 
   const addActivity = async () => {
-    if (activityInputValue.trim() !== "") {
+    if (activityInputValue.trim()) {
       try {
-        await api.post("/activitylist/", {
+        await api.post('/activitylist/', {
           project_name: projects.id,
           list_title: activityInputValue,
         });
-        setActivityInputValue("");
-        fetchData(); // Refetch activities and tasks after adding an activity
+        setActivityInputValue('');
+        fetchData();
       } catch (error) {
-        console.error("Error adding activity:", error);
+        console.error('Error adding activity:', error);
+        message.error('Failed to add activity');
       }
     }
   };
-  const handleDateChangestart  = (dateString) => {
-    
-    setStartDate(dateString)
 
-  };
-  const handleDateChange = (dateString) => {
- 
-    setEndDate(dateString)
+  const handleDateChange = (date, dateString, type) => {
+    if (date) {
+      if (type === 'start') {
+        setStartDate(dateString);
+      } else {
+        setEndDate(dateString);
+      }
+    }
   };
 
   const deleteActivity = async (activityId) => {
     try {
       await api.delete(`/activitylist/${activityId}/`);
-      fetchData(); // Refetch activities and tasks after deleting an activity
-      message.success("Activity deleted successfully");
+      fetchData();
+      message.success('Activity deleted successfully');
     } catch (error) {
-      console.error("Error deleting activity:", error);
-      message.error("Failed to delete activity");
+      console.error('Error deleting activity:', error);
+      message.error('Failed to delete activity');
     }
   };
 
   return (
     <Layout>
-      <div
-        className="w-[100%] flex flex-col space-y-4"
-        style={{ height: "90vh" }}
-      >
+      <div className="w-full flex flex-col space-y-4" style={{ height: '90vh' }}>
         <div className="flex justify-between font-bold">
           <h1 className="text-lg capitalize text-gray-800 font-semibold">
             {projects?.project_name} Kanban Board
           </h1>
-      { canAdd ? <div className="flex gap-2">
-            <button
-              className="text-white rounded-md bg-blue-500 py-2 px-4"
-              onClick={showModal}
-              
-            >
-              Add Task
-            </button>
-            <button
-              className="rounded-md text-blue-500 border-2 border-blue-500 py-2 px-4"
-              onClick={showActivityModal}
-             
-            >
-              Create Activity
-            </button>
-          </div> :null}
+          {canAdd && (
+            <div className="flex gap-2 pr-20">
+              <Button
+                type="dashed"
+                onClick={showModal}
+                size="large"
+                icon={<AntDesignOutlined />}
+              >
+                Add New Task
+              </Button>
+              <Button
+                type="dashed"
+                onClick={showActivityModal}
+                size="large"
+                icon={<AntDesignOutlined />}
+              >
+                Add Activity
+              </Button>
+            </div>
+          )}
         </div>
-        <ActivityCard
-      key={`${activities.length}-${tasks.length}`} // Unique key to force re-render
-      projects={projects}
-      tasks={tasks}
-      activities={activities}
-      onDeleteActivity={deleteActivity}
-        />
+        {loading ? (
+          <p>Loading Board !!...</p>
+        ) : (
+          <ActivityCard
+            key={`${activities.length}-${tasks.length}`}
+            projects={projects}
+            tasks={tasks}
+            activities={activities}
+            onDeleteActivity={deleteActivity}
+            permissions={permissions}
+          />
+        )}
       </div>
 
       <Modal
-        title="Add Task"
+        title="Add New Task"
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <div className="col-12">
-        <div className="row">
-        <Input
-          placeholder="Task name"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        />
-        </div>
-        </div>
-          <div className="col-12">
-       <div className="row">
-      <div className="col-6">
-        <label>Start Date</label>
-        <div>
-        <DatePicker
-           
-            value={startDate ? dayjs(startDate, dateFormat) : null}
-            onChange={(date, dateString) => handleDateChangestart (dateString)} 
-     
-            format={dateFormat}
-          />
-        </div>
-      </div>
-      <div className="col-6">
-        <label>End Date  </label>
-        <div>
-          <DatePicker
-            value={endDate ? dayjs(endDate, dateFormat) : null}
-            onChange={(date, dateString) => handleDateChange(dateString)} 
-     
-            format={dateFormat}
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-        <Button
-          type="primary"
-          className="mt-4"
-          onClick={addTodo}
-          disabled={!inputValue.trim() || ! canAdd }
-   
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={addTodo}
         >
-          Add Task
-        </Button>
+          <Form.Item
+            name="taskName"
+            label="Task Name"
+            rules={[{ required: true, message: 'Please enter a task name!' }]}
+          >
+            <Input
+              placeholder="Task name"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="startDate"
+            label="Start Date"
+            rules={[{ required: true, message: 'Please select a start date!' }]}
+          >
+            <DatePicker
+              value={startDate ? dayjs(startDate, dateFormat) : null}
+              onChange={(date, dateString) => handleDateChange(date, dateString, 'start')}
+              format={dateFormat}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="endDate"
+            label="End Date"
+            rules={[{ required: true, message: 'Please select an end date!' }]}
+          >
+            <DatePicker
+              value={endDate ? dayjs(endDate, dateFormat) : null}
+              onChange={(date, dateString) => handleDateChange(date, dateString, 'end')}
+              format={dateFormat}
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              className="mt-4"
+              htmlType="submit"
+              disabled={!inputValue.trim() || !canAdd}
+    
+            >
+              Add Task
+            </Button>
+          </Form.Item>
+        </Form>
       </Modal>
 
       <Modal
@@ -261,7 +259,6 @@ console.log("canEdit,canAdd,canDelete,canView",canEdit,canAdd,canDelete,canView,
           value={activityInputValue}
           onChange={(e) => setActivityInputValue(e.target.value)}
         />
-       
       </Modal>
     </Layout>
   );

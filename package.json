@@ -53,6 +53,7 @@
     "react-avatar": "^5.0.3",
     "react-beautiful-dnd": "^13.1.1",
     "react-big-calendar": "^1.12.2",
+    "react-big-schedule": "^4.4.0",
     "react-big-scheduler": "^0.2.4",
     "react-bootstrap": "^2.10.2",
     "react-calendar": "^5.0.0",

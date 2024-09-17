@@ -17,10 +17,12 @@ const dateFormat = 'YYYY-MM-DD';
 function MyFormDialog({
   open,
   selectedTask,
+  
   allusers,
   assignedtaskmembers,
   handleClose,
   handleTaskUpdate,
+
 }) {
   const api = useAxios();
  
@@ -127,8 +129,10 @@ function MyFormDialog({
       console.error("Error adding item:", error);
     }
 
-    setSelectedValues(selectedList);
+   // setSelectedValues(selectedItem);
   };
+
+
 
   const onRemove = async (selectedList, removedItem) => {
     if (!removedItem) return;

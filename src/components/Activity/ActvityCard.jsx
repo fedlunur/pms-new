@@ -6,20 +6,20 @@ import { useLocation } from "react-router-dom";
 import DataService from "../DataServices";
 import { Col, Row } from "antd";
 
-export default function ActivityCard({ projects, onDeleteActivity }) {
+export default function ActivityCard({ projects, onDeleteActivity, permissions }) {
   const [activities, setActivities] = useState([]);
   const [tasks, setTasks] = useState([]);
   const api = useAxios();
-  const {
-    allactivities,
-    alltasks,
-    alluserss,
-    alltaskmembers,
-    loading,
-    error,
-    activities_by_project,
-    tasksbyproject,
-  } = DataService(); // Assuming useCrud fetches data
+   const {
+  //   allactivities,
+     alltasks,
+     alluserss,
+     alltaskmembers,
+     loading,
+  //   error,
+     activities_by_project,
+  //   tasksbyproject,
+   } = DataService(); // Assuming useCrud fetches data
 
   const activitiesForProject = activities_by_project(projects);
   useEffect(() => {
@@ -102,6 +102,7 @@ export default function ActivityCard({ projects, onDeleteActivity }) {
                       incomingTasks={tasksForActivity}
                       id={activity.id.toString()}
                       onDeleteActivity={onDeleteActivity}
+                      permissions={permissions}
                     />
                     </div>
                   //  </Col>

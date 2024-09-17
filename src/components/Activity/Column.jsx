@@ -102,11 +102,12 @@ export default function Column({
   teammeber,
   incomingTasks,
   id,
-  onDeleteActivity
+  onDeleteActivity,
+  permissions
 }) {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState([]);
-  const [selectedValue, setSelectedValues] = useState([]);
+ 
   
   const [inputValue, setInputValue] = useState("");
   const [editIndex, setEditIndex] = useState(-1);
@@ -156,42 +157,6 @@ export default function Column({
     setConfirmationOpen(false);
   };
 
-  const addTodo = async () => {
-    if (inputValue.trim() !== "") {
-      try {
-        const response = await api.post("/tasklist/", {
-          task_name: inputValue,
-          activity: id,
-          completed: false,
-        });
-        setTasks([...tasks, response.data]);
-        setInputValue("");
-      } catch (error) {
-        console.error("Error adding task:", error);
-      }
-    }
-  };
-
-  const cancelEdit = () => {
-    setInputValue("");
-    setEditIndex(-1);
-  };
-
-  const updateTodo = async () => {
-    if (editIndex !== -1 && inputValue.trim() !== "") {
-      try {
-        const updatedTask = { ...tasks[editIndex], task_name: inputValue };
-        await api.put(`/tasklist/${updatedTask.id}/`, updatedTask);
-        const updatedTasks = [...tasks];
-        updatedTasks[editIndex] = updatedTask;
-        setTasks(updatedTasks);
-        setInputValue("");
-        setEditIndex(-1);
-      } catch (error) {
-        console.error("Error updating task:", error);
-      }
-    }
-  };
 
  
   const handleOpen = (selectedtask, taskmembers) => {
@@ -288,13 +253,16 @@ export default function Column({
     onClick: (e) => handleMenuClick(e, task),
     items,
   });
-  const teammemberTemplate = (rowData) => {
+  const teammemberTemplate = (task) => {
    // const members = assignedtaskmembers.filter(member => member.team.id === rowData.team);
 
     const members = singletaskmembers
-    console.log("Just did some thing ", members)
-    return members.length > 0 ? (
-      <Avatar.Group
+    console.log("Just did some thing ", members,"taskmembers ===>  ",taskmembers,"task ====> ",task)
+   
+    return  taskmembers
+    .filter(
+      (taskm) => taskm.task_id === task.id
+    ).length > 0 ? (    <Avatar.Group
         max={{
           count: 2,
           style: {
@@ -303,23 +271,24 @@ export default function Column({
           },
         }}
       >
-        {members.map(member => (
-          <Tooltip title={member.user.first_name} key={member.id}>
+        {taskmembers.map(member => (
+          <Tooltip title={member.user} key={member.id}>
             <Avatar
               style={{
                 backgroundColor: "#e0f2ff",
                 color: "#3b82f6",
                 cursor: "pointer",
               }}
-              onClick={() => console.log(member.id)}
+             
             >
-              {member.user.first_name.charAt(0)}
+      
+               {member.assigned_to_first_name.charAt(0)}
             </Avatar>
           </Tooltip>
         ))}
       </Avatar.Group>
     ) : (
-      <span>No Team Members</span>
+      <span>No member assigned</span>
     );
   };
   const ConfirmationDialog = ({ open, onClose, onConfirm }) => {
@@ -383,7 +352,7 @@ export default function Column({
         onClose={onClose}
         open={openDrawer}
       >
-        <Checklist task={selectedTask}   taskchecklist={filteredSubtasks} />
+        <Checklist task={selectedTask}  permissions={permissions} taskchecklist={filteredSubtasks} />
       </Drawer>
     );
   };
@@ -491,15 +460,17 @@ export default function Column({
         <div
           className={`w-[60%] rounded-xl px-3 py-3 h-full ${
             title === "To Do"
-              ? "bg-blue-500"
+              ? "bg-cyan-500"
               : title === "On Progress"
-              ? "bg-orange-500"
+              ? "bg-orange-400"
               : title === "Done"
               ? "bg-green-500"
-              : "bg-blue-500"
+              : title === "Inturrupted"
+              ? "bg-red-500"
+              : "bg-purple-500"
           }`}
         >
-          <h3 className="text-sm text-left text-white">{title}</h3>
+          <h3 className="text-sm text-left text-white">{title==="Done"?"Completed":title}</h3>
         </div>
         <div className="flex mx-4">
 
@@ -511,10 +482,12 @@ export default function Column({
         <MyFormDialog
           open={open}
           selectedTask={selectedTask}
+
           allusers={allusers}
           assignedtaskmembers={singletaskmembers}
           handleClose={handleClose}
           handleTaskUpdate={handleTaskUpdate}
+         
         />
         <ConfirmationDialog
           open={confirmationOpen}
@@ -536,7 +509,7 @@ export default function Column({
             draggableId={`${task.id}`}
             key={task.id}
             index={index}
-            isDragDisabled={!task.movable} // Disable dragging if movable is false
+            isDragDisabled={!task.movable ||  ! permissions.canMove } // Disable dragging if movable is false
           >
             {(provided, snapshot) => {
               const { text: textPriority, color: colorPriority } =
@@ -555,7 +528,7 @@ export default function Column({
                   >
                     <div className="flex justify-between items-center mb-2">
                       <div className="flex gap-2">
-                        <Tooltip title={textPriority}>
+                        <Tooltip title={textPriority} >
                           <div
                             className={`${colorPriority} w-3 h-3 rounded-full`}
                           ></div>
@@ -566,13 +539,13 @@ export default function Column({
                           onClick={() => showDrawer(task)}
                         />
                       </div>
-                      <Dropdown menu={menuProps(task)}>
-                        <BsThreeDotsVertical className="text-gray-500 cursor-pointer" />
-                      </Dropdown>
+                      {permissions.canEdit &&  <Dropdown menu={menuProps(task)}>
+                   <BsThreeDotsVertical className="text-gray-500 cursor-pointer" />
+                      </Dropdown> }
                     </div>
                     <h1 className="text-sm font-semibold capitalize">
                       {task.task_name}  
-                      <p>Movable: {task.movable ? 'Yes' : 'No'}</p>
+                    
                     </h1>
 
                     <div className="flex flex-col mt-4">
@@ -604,29 +577,48 @@ export default function Column({
                         className="text-xs text-gray-600 cursor-pointer"
                         onClick={() => showIssueDrawer(task)}
                       >
-                         {/* {teammemberTemplate(task)} */}
+                      
+
                          <small>
                             <div className="card-tools">
                               <div style={{ display: "flex", gap: "8px" }}>
-                                {taskmembers &&
-                                  taskmembers.length > 0 &&
-                                  taskmembers
-                                    .filter(
-                                      (taskm) => taskm.task_id === task.id
-                                    )
-                                    .map((taskMember) => (
-                                      <Avatar
-                                        key={taskMember.id} // Don't forget to add a unique key for each avatar
-                                        onClick={() => console.log(task)}
-                                        src={
-                                          "https://joesch.moe/api/v1/random?key=" +
-                                          taskMember.assigned_to_id
-                                        }
-                                        
-                                        style={{ cursor: "pointer" }} // Add cursor pointer for better UX
-                                      />
-                                    ))}
-                                {/*  */}
+
+                              {
+
+taskmembers.filter((taskm) => taskm.task_id === task.id).length > 0 ? (
+  <Avatar.Group
+    max={{
+      count: 2,
+      style: {
+        color: "#3b82f6",
+        backgroundColor: "#e0f2ff",
+      },
+    }}
+  >
+    {taskmembers
+      .filter((taskm) => taskm.task_id === task.id)
+      .map((member) => (
+        <Tooltip title={member.assigned_to_first_name +' ' + member.assigned_to_middle_name} key={member.id}>
+          <Avatar
+            style={{
+              backgroundColor: "#e0f2ff",
+              color: "#3b82f6",
+              cursor: "pointer",
+            }}
+            // onClick={() => console.log(member.user.id)}
+          >
+            {member.assigned_to_first_name.charAt(0)}
+          </Avatar>
+        </Tooltip>
+      ))}
+  </Avatar.Group>
+) : (
+  <span>No Team Members</span>
+)
+
+                              }
+
+                            
                               </div>
 
 

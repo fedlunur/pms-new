@@ -1,33 +1,22 @@
 import React, { useState, useEffect } from "react";
-import TextField from "@mui/material/TextField";
-import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Checkbox from "@mui/material/Checkbox";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
+import { Input, List, Checkbox, Button } from "antd";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import useAxios from "../../utils/useAxios";
-import axios from "axios"; // Import Axios
-import { MdDeleteOutline } from "react-icons/md";
-import { Input } from "antd";
 
-function Checklist({ task,taskchecklist }) {
+function Checklist({ task, taskchecklist, permissions }) {
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState("");
-  const api = useAxios(); // Correctly defining the api variable here
+  const api = useAxios();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchChecklistItems = async () => {
       try {
-       setItems(taskchecklist)
+        setItems(taskchecklist);
       } catch (error) {
         console.error("Error fetching checklist items:", error);
       }
     };
-
     fetchChecklistItems();
   }, []);
 
@@ -59,7 +48,6 @@ function Checklist({ task,taskchecklist }) {
       console.error("Error updating item:", error);
     }
   };
-  const [loading, setLoading] = useState(false);
 
   const handleDeleteItem = (Incomingitem) => async () => {
     try {
@@ -73,49 +61,58 @@ function Checklist({ task,taskchecklist }) {
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center" }} className="gap-1">
-        <Input
-          size="medium"
-          placeholder="Enter Checklist"
-          value={newItem}
-          onChange={(e) => setNewItem(e.target.value)}
-        />
-       
-        <IconButton onClick={handleAddItem} className="">
-          <AddIcon size={14} color="white" className="bg-black py-1"/>
-        </IconButton>
-      </div>
-      <List sx={{ width: "100%"}}>
-        {items && items.map((item) => (
-          <ListItem key={item.id} disablePadding divider className ='text-xs'>
-            <ListItemButton dense>
-              <ListItemIcon sx={{ minWidth: "auto" }}>
+      {permissions.canEdit && (
+        <div style={{ display: "flex", alignItems: "center" }} className="gap-1">
+          <Input
+            size="medium"
+            placeholder="Enter Checklist"
+            value={newItem}
+            onChange={(e) => setNewItem(e.target.value)}
+          />
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAddItem}
+            className="bg-black"
+          />
+        </div>
+      )}
+      <List
+        itemLayout="horizontal"
+        dataSource={items}
+        renderItem={(item) => (
+          <List.Item
+            actions={[
+              permissions.canEdit && (
                 <Checkbox
-                  edge="start"
                   checked={item.status}
-                  disableRipple
-                  sx={{ padding: 0.5 }}
                   onClick={handleToggle(item.id)}
-                  className="text-gray-800"
                 />
-              </ListItemIcon>
-              <ListItemText
-                primary={item.name}
-                sx={{
-                  flex: "1 1 auto",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                  textDecoration: item.status ? "line-through" : "none",
-                }}
-              />
-              <IconButton onClick={handleDeleteItem(item)} >
-              <MdDeleteOutline className="text-gray-800" size={16} />
-              </IconButton>
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+              ),
+              permissions.canEdit && (
+                <Button
+                  icon={<DeleteOutlined />}
+                  onClick={handleDeleteItem(item)}
+                  type="text"
+                  danger
+                />
+              ),
+            ]}
+          >
+            <List.Item.Meta
+              title={
+                <span
+                  style={{
+                    textDecoration: item.status ? "line-through" : "none",
+                  }}
+                >
+                  {item.name}
+                </span>
+              }
+            />
+          </List.Item>
+        )}
+      />
     </div>
   );
 }
