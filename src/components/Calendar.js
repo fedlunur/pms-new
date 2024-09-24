@@ -1,5 +1,4 @@
-
-import React, {useContext ,useState, useEffect, useRef } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { Col, Row, Form, Modal, Button, InputGroup } from "react-bootstrap";
 import Datetime from "react-datetime";
 import { CalendarIcon } from "@heroicons/react/solid";
@@ -13,12 +12,13 @@ import withReactContent from "sweetalert2-react-content";
 import moment from "moment";
 import Layout from "../views/Layout";
 import useAxios from "../utils/useAxios";
-import { Avatar, List } from 'antd';
+import { Avatar, List } from "antd";
 import AuthContext from "../context/AuthContext";
+import { format } from 'date-fns';
+
 // import useRole from "../useRole";
 import {
   Box,
-
   Checkbox,
   Typography,
   Dialog,
@@ -38,37 +38,38 @@ const SwalWithBootstrapButtons = withReactContent(
   })
 );
 const filterTodaysEvents = (events) => {
-  const todayStart = moment().startOf('day').toDate();
-  const todayEnd = moment().endOf('day').toDate();
-  
-  return events.filter(event => {
+  const todayStart = moment().startOf("day").toDate();
+  const todayEnd = moment().endOf("day").toDate();
+
+  return events.filter((event) => {
     const eventStart = new Date(event.start);
     const eventEnd = new Date(event.end || event.start);
 
     // Check if the event falls within today
-    const isToday = (eventStart >= todayStart && eventStart <= todayEnd) ||
-                    (eventEnd >= todayStart && eventEnd <= todayEnd) ||
-                    (eventStart <= todayStart && eventEnd >= todayEnd);
-    
+    const isToday =
+      (eventStart >= todayStart && eventStart <= todayEnd) ||
+      (eventEnd >= todayStart && eventEnd <= todayEnd) ||
+      (eventStart <= todayStart && eventEnd >= todayEnd);
+
     // Check if the event falls within a different date range, e.g., this week
-    const weekStart = moment().startOf('week').toDate();
-    const weekEnd = moment().endOf('week').toDate();
-    const isThisWeek = (eventStart >= weekStart && eventStart <= weekEnd) ||
-                       (eventEnd >= weekStart && eventEnd <= weekEnd) ||
-                       (eventStart <= weekStart && eventEnd >= weekEnd);
+    const weekStart = moment().startOf("week").toDate();
+    const weekEnd = moment().endOf("week").toDate();
+    const isThisWeek =
+      (eventStart >= weekStart && eventStart <= weekEnd) ||
+      (eventEnd >= weekStart && eventEnd <= weekEnd) ||
+      (eventStart <= weekStart && eventEnd >= weekEnd);
 
     // Include additional checks here
     return isToday || isThisWeek;
   });
 };
 
-
 const EventModal = (props) => {
   const [title, setTitle] = useState(props.title);
   const [start, setStart] = useState(props.start);
   const [end, setEnd] = useState(props.end);
   const [created_by, setCreated_by] = useState(props.created_by);
- 
+
   const { show = false, edit = false, id } = props;
   const startDate = start
     ? moment(start).format("YYYY-MM-DD")
@@ -160,12 +161,21 @@ const EventModal = (props) => {
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" className="me-2" onClick={onConfirm} style={{backgroundColor:'#0d6efd'}}>
+          <Button
+            variant="primary"
+            className="me-2"
+            onClick={onConfirm}
+            style={{ backgroundColor: "#0d6efd" }}
+          >
             {edit ? "Update event" : "Add new event"}
           </Button>
 
           {edit ? (
-            <Button variant="danger" onClick={onDelete} style={{backgroundColor:'#dc3545'}}>
+            <Button
+              variant="danger"
+              onClick={onDelete}
+              style={{ backgroundColor: "#dc3545" }}
+            >
               Delete event
             </Button>
           ) : null}
@@ -185,13 +195,13 @@ function formatDate(date, formatString = "YYYY-MM-DD") {
 }
 const Calendar = () => {
   const api = useAxios();
- 
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const response = await api.get("/events/");
         const fetchedEvents = response.data;
-        console.log("The fetched Data are  %%%%  ",fetchedEvents)
+        console.log("The fetched Data are  %%%%  ", fetchedEvents);
         setEvents(fetchedEvents);
         const todaysEvents = filterTodaysEvents(fetchedEvents);
         setCurrentEvents(todaysEvents);
@@ -202,13 +212,19 @@ const Calendar = () => {
 
     fetchEvents();
   }, []);
-  const defaultModalProps = { id: "", title: "", start: null, end: null ,created_by:null };
+  const defaultModalProps = {
+    id: "",
+    title: "",
+    start: null,
+    end: null,
+    created_by: null,
+  };
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalProps, setModalProps] = useState(defaultModalProps);
   const [events, setEvents] = useState([]);
   const [currentEvents, setCurrentEvents] = useState([]);
-  const {user, logoutUser } = useContext(AuthContext);
+  const { user, logoutUser } = useContext(AuthContext);
   const calendarRef = useRef();
   const currentDate = moment().format("YYYY-MM-DD");
 
@@ -222,9 +238,9 @@ const Calendar = () => {
 
   const onEventClick = (props) => {
     const {
-      event: { id, title, start, end,created_by },
+      event: { id, title, start, end, created_by },
     } = props;
-    setModalProps({ id, title, start, end,created_by });
+    setModalProps({ id, title, start, end, created_by });
     setShowEditModal(true);
   };
 
@@ -251,11 +267,11 @@ const Calendar = () => {
       draggable: true,
       className: "bg-blue text-white",
       allDay: true,
-      created_by: user.user_id
+      created_by: user.user_id,
     };
     try {
       const response = await api.post("/events/", newEvent);
-  
+
       if (response) {
         setShowAddModal(false);
         const updatedEvents = [...events, newEvent];
@@ -270,7 +286,7 @@ const Calendar = () => {
       console.error("Error creating event:", error);
     }
   };
-  
+
   const onEventDelete = async function (id) {
     const result = await SwalWithBootstrapButtons.fire({
       icon: "error",
@@ -280,10 +296,10 @@ const Calendar = () => {
       confirmButtonText: "Yes",
       cancelButtonText: "Cancel",
     });
-  
+
     setShowEditModal(false);
     setModalProps(defaultModalProps);
-  
+
     if (result.isConfirmed) {
       await api.delete(`/events/${id}/`);
       SwalWithBootstrapButtons.fire(
@@ -357,130 +373,119 @@ const Calendar = () => {
       ) : null}
       <Layout>
         <div>
-
-   
-        <div className="p-1">
-      
-              <div className="container-fluid py-1 px-2">
-                <div className="row mb-2">
-                  <div className="col-sm-6">
-                    {/* <h1 className="m-0">Scheduler</h1> */}
-                  </div>
+          <div className="p-1">
+            <div className="container-fluid py-1 px-2">
+              <div className="row mb-2">
+                <div className="col-sm-6">
+                  {/* <h1 className="m-0">Scheduler</h1> */}
                 </div>
-                <section className="content">
-                  <div className="container-fluid">
-                    <div className="row">
-                      <div className="col-12">
-                        <div className="card">
-                          <div className="card-header" style={{backgroundColor: "##e2fcf5 "}}>
-                            <h3
-                              className="card-title"
-                              style={{
-                                backgroundColor: "white",
-                                color: "#6c757d",
-                                fontSize: 18,
-                                margin: "0",
-                                padding: "0",
-                                fontStyle: "normal",
-                                fontFamily: "inherit",
-                              }}
+              </div>
+              <section className="">
+                <div className="">
+                  <div className="row">
+                    <div className="col-12">
+                      <div className="">
+                        <div className="">
+                          <Box display="flex" justifyContent="space-between">
+                            <Box
+                              flex="1 1 30%"
+                              p="15px"
+                              borderRadius="4px"
+                              className="bg-white"
                             >
-                              Schedule Your Events
-                            </h3>
-                          </div>
-                          <div className="card-body">
-                            <Box display="flex" justifyContent="space-between">
-                              <Box flex="1 1 20%" p="15px" borderRadius="4px">
-                                <Typography variant="h5">Today's - Event</Typography>
-                             
-                                <List
-      itemLayout="horizontal"
-      dataSource={currentEvents}
-      renderItem={(event) => (
-        <List.Item>
-    
+                              <Typography variant="h5" className="mb-3">
+                                Today's - Event
+                              </Typography>
 
-
-          <List.Item.Meta
-            avatar={
-              <Avatar
-                src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${event.id}`} // Generate a unique avatar for each event
-                style={{ backgroundColor: '#87d068' }} // Optional: Customize avatar background color  created_by {event.created_by_detail?.first_name}
-              />
-            }
-            title={
-              <a href="#">
-                {event.title} created by {event.created_by_detail?.first_name } {event.created_by_detail?.last_name}
-                {event.created_by}
-               
-              </a>
-            }
-            description={formatDate(event.start, {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "",
-              minute: "2-digit",
-              hour12: true,
-            })}
-          />
-       
-        </List.Item>
-
-      )}
-    />
-                              </Box>
-
-                              <Box flex="1 1 100%" ml="15px">
-                                <FullCalendar
-                                  height="500px"
-                                  editable={true}
-                                  selectable={true}
-                                  selectMirror={true}
-                                  dayMaxEvents={true}
-                                  events={events}
-                                  ref={calendarRef}
-                                  themeSystem="bootstrap"
-                                  initialView="dayGridMonth"
-                                  displayEventTime={false}
-                                  initialDate={currentDate}
-                                  dateClick={onDateClick}
-                                  eventClick={onEventClick}
-                                  plugins={[
-                                    dayGridPlugin,
-                                    timeGridPlugin,
-                                    bootstrapPlugin,
-                                    interactionPlugin,
-                                  ]}
-                                  headerToolbar={{
-                                    left:"prev,next today",
-                                    right: "dayGridMonth,timeGridWeek,timeGridDay",
-                                    center: "title",
-                                  }}
-                                  buttonText={{
-                                    prev: "Previous",
-                                    next: "Next",
-                                    month: "Month",
-                                    week: "Week",
-                                    day: "Day",
-                                    today: "Today",
-                                  }}
-                                  eventsSet={(updatedEvents) =>
-                                    setCurrentEvents(filterTodaysEvents(updatedEvents))
-                                  }
-                                  eventDrop={handleEventDrop}
-                                />
-                              </Box>
+                              <List
+                                itemLayout="horizontal"
+                                dataSource={currentEvents}
+                                renderItem={(event) => (
+                                  <List.Item className="bg-blue-100 px-3 rounded-sm mb-2 hover:bg-blue-200">
+                                    <List.Item.Meta
+                                      avatar={
+                                        <Avatar
+                                          src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${event.id}`} 
+                                          style={{ backgroundColor: "#87d068" }} 
+                                        />
+                                      }
+                                      description={
+                                        <a href="#">{event.title}</a>
+                                      }
+                                      title={
+                                        <span className="font-semibold">
+                                          {format(
+                                            new Date(event.start),
+                                            "MMM dd, yyyy, hh:mm a"
+                                          )}
+                                        </span>
+                                      }
+                                    />
+                                  </List.Item>
+                                )}
+                              />
                             </Box>
-                          </div>
+
+                            <Box flex="1 1 100%" ml="15px">
+                              <FullCalendar
+                                height="75vh"
+                                editable={true}
+                                selectable={true}
+                                selectMirror={true}
+                                dayMaxEvents={true}
+                                events={events}
+                                ref={calendarRef}
+                                themeSystem="bootstrap"
+                                initialView="dayGridMonth"
+                                displayEventTime={false}
+                                initialDate={currentDate}
+                                dateClick={onDateClick}
+                                eventClick={onEventClick}
+                                plugins={[
+                                  dayGridPlugin,
+                                  timeGridPlugin,
+                                  bootstrapPlugin,
+                                  interactionPlugin,
+                                ]}
+                                headerToolbar={{
+                                  left: "title",
+                                  center: "",
+                                  right: "prev,next",
+                                }}
+                                footerToolbar={{
+                                  left: "",
+                                  center: "",
+                                  right:
+                                    "dayGridMonth,timeGridWeek,timeGridDay",
+                                }}
+                                buttonIcons={{
+                                  prev: "chevron-left",
+                                  next: "chevron-right",
+                                }}
+                                buttonText={{
+                                  month: "Month",
+                                  week: "Week",
+                                  day: "Day",
+                                  prev: "",
+                                  next: "",
+                                }}
+                                eventsSet={(updatedEvents) =>
+                                  setCurrentEvents(
+                                    filterTodaysEvents(updatedEvents)
+                                  )
+                                }
+                                eventDrop={handleEventDrop}
+                              />
+                            </Box>
+                          </Box>
                         </div>
                       </div>
                     </div>
                   </div>
-                </section>
-              </div>
+                </div>
+              </section>
             </div>
-      
+          </div>
         </div>
       </Layout>
     </>

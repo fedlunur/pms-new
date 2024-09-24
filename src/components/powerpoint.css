@@ -1,0 +1,7 @@
+.powerpoint-bg{
+    background: hsla(217, 91%, 60%, 1);
+    background: linear-gradient(180deg, hsla(217, 91%, 60%, 1) 60%, hsla(217, 52%, 71%, 1) 100%);
+    background: -moz-linear-gradient(180deg, hsla(217, 91%, 60%, 1) 60%, hsla(217, 52%, 71%, 1) 100%);
+    background: -webkit-linear-gradient(180deg, hsla(217, 91%, 60%, 1) 60%, hsla(217, 52%, 71%, 1) 100%);
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#3B82F6", endColorstr="#90ADDC", GradientType=1 );
+}

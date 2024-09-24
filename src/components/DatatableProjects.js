@@ -1,22 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Card, Col, Divider, Progress, Row,Space , Typography, Button, Avatar, Tooltip, Carousel ,Radio  } from "antd";
+import {
+  Card,
+  Col,
+  Divider,
+  Progress,
+  Row,
+  Space,
+  Typography,
+  Button,
+  Avatar,
+  Tooltip,
+  Carousel,
+  Radio,
+  Modal,
+} from "antd";
 import { FaEye } from "react-icons/fa";
-import './DatatableProjects.css'; 
+import "./DatatableProjects.css";
 import { Margin } from "@mui/icons-material";
+import Powerpoint from "./powerpoint";
 const { Paragraph } = Typography;
 const { Text } = Typography;
 
 const contentStyle = {
   margin: 15,
-  height: '460px',
-  color: '#fff',
-  lineHeight: '260px',
-  textAlign: 'center',
-  background: '#06a7b5',
+  height: "460px",
+  color: "#fff",
+  lineHeight: "260px",
+  textAlign: "center",
 };
 const rowStyle = {
-  margin: 10,  // Add margin
+  margin: 10, // Add margin
   padding: 15, // Add padding
 };
 
@@ -29,18 +43,36 @@ const chunkArray = (array, size) => {
   return result;
 };
 
-function DatatableProjects({ projects, teammembers, users, activities, tasks }) {
+function DatatableProjects({
+  projects,
+  teammembers,
+  users,
+  activities,
+  tasks,
+}) {
   const history = useHistory();
   const [tasksForProject, setTasksForProject] = useState([]);
 
-  const [dotPosition, setDotPosition] = useState('left');
+  const [dotPosition, setDotPosition] = useState("left");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   const handlePositionChange = ({ target: { value } }) => {
     setDotPosition(value);
   };
 
   const teammemberTemplate = (rowData) => {
-    const members = teammembers.filter(member => member.team.id === rowData.team);
+    const members = teammembers.filter(
+      (member) => member.team.id === rowData.team
+    );
     return members.length > 0 ? (
       <Avatar.Group
         max={{
@@ -51,7 +83,7 @@ function DatatableProjects({ projects, teammembers, users, activities, tasks }) 
           },
         }}
       >
-        {members.map(member => (
+        {members.map((member) => (
           <Tooltip title={member.user.first_name} key={member.id}>
             <Avatar
               style={{
@@ -72,28 +104,28 @@ function DatatableProjects({ projects, teammembers, users, activities, tasks }) 
   };
 
   const totalTaskTemplate = (rowData) => {
-    const activityList = activities.filter(activity => activity.project_name === rowData.id);
-    const tasklist = tasks.filter(task => activityList.some(activity => activity.id === task.activity));
-    const taskCount = tasklist.length;
-    
-    return (
-      <div style={{ display: "flex", gap: "8px" }}>
-        {taskCount}
-      </div>
+    const activityList = activities.filter(
+      (activity) => activity.project_name === rowData.id
     );
+    const tasklist = tasks.filter((task) =>
+      activityList.some((activity) => activity.id === task.activity)
+    );
+    const taskCount = tasklist.length;
+
+    return <div style={{ display: "flex", gap: "8px" }}>{taskCount}</div>;
   };
 
   const fetchTasksForProject = (projectId) => {
-    return tasks.filter(task =>
+    return tasks.filter((task) =>
       activities.some(
-        activity =>
+        (activity) =>
           activity.id === task.activity && activity.project_name === projectId
       )
     );
   };
 
   useEffect(() => {
-    const tasksByProject = projects.map(project => ({
+    const tasksByProject = projects.map((project) => ({
       projectId: project.id,
       tasks: fetchTasksForProject(project.id),
     }));
@@ -101,10 +133,13 @@ function DatatableProjects({ projects, teammembers, users, activities, tasks }) 
   }, [projects, tasks, activities]);
 
   const calculateProgress = (projectId) => {
-    const projectTasks = tasksForProject.find(p => p.projectId === projectId)?.tasks;
-    const doneTasks = projectTasks?.filter(task =>
-      activities.find(activity =>
-        activity.id === task.activity && activity.list_title === "Done"
+    const projectTasks = tasksForProject.find(
+      (p) => p.projectId === projectId
+    )?.tasks;
+    const doneTasks = projectTasks?.filter((task) =>
+      activities.find(
+        (activity) =>
+          activity.id === task.activity && activity.list_title === "Done"
       )
     ).length;
 
@@ -116,21 +151,19 @@ function DatatableProjects({ projects, teammembers, users, activities, tasks }) 
   const ProjectDescription = ({ description }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const MAX_LENGTH = 100;
-  
+
     const handleToggle = () => {
       setIsExpanded(!isExpanded);
     };
-  
+
     const truncatedDescription =
       description.length > MAX_LENGTH
         ? `${description.slice(0, MAX_LENGTH)}...`
         : description;
-  
+
     return (
       <div>
-        <Paragraph>
-          {isExpanded ? description : truncatedDescription}
-        </Paragraph>
+        <Paragraph>{isExpanded ? description : truncatedDescription}</Paragraph>
         {description.length > MAX_LENGTH && (
           <Button type="link" onClick={handleToggle}>
             {isExpanded ? "Read Less" : "Read More"}
@@ -146,10 +179,15 @@ function DatatableProjects({ projects, teammembers, users, activities, tasks }) 
   return (
     <div>
       <section>
-        <div className="bg-transparent">
-          <h1 className="font-semibold text-lg text-gray-800 mb-4">
-            Projects
-          </h1>
+        <div className="relative bg-transparent h-[90vh]">
+          <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/3 w-[80%] h-[65vh] rounded-md  bg-blue-400 py-2">
+            <h1 className="text-7xl font-bold text-center text-gray-200">
+              Projects
+            </h1>
+            <p className="text-center text-gray-200 font-semibold">
+              Track and manage your projects seamlessly with real-time updates
+            </p>
+          </div>
           {/* <Radio.Group
         onChange={handlePositionChange}
         value={dotPosition}
@@ -162,21 +200,19 @@ function DatatableProjects({ projects, teammembers, users, activities, tasks }) 
         <Radio.Button value="left">Left</Radio.Button>
         <Radio.Button value="right">Right</Radio.Button>
       </Radio.Group> */}
-          <Carousel fade="true" autoplay arrows dotPosition={dotPosition} adaptiveHeight="true" className="custom-carousel">
-          
+          <Carousel
+            fade="true"
+            autoplay
+            dotPosition={dotPosition}
+            className="bg-transparent"
+          >
             {projectGroups.map((group, index) => (
-              <div key={index}>
-               
-                <Row style={{ ...contentStyle, ...rowStyle }}  gutter={10}>
-
-                  {group.map(project => (
-                    
+              <div key={index} className="w-[800px] mt-40">
+                <Row style={{ ...contentStyle, ...rowStyle }} gutter={10}>
+                  {group.map((project) => (
                     <Col span={12} key={project.id}>
-                               
-
                       <Card>
-                      
-                        <div className="flex justify-between items-center mb-4">
+                        <div className="flex justify-between items-center ">
                           <div>
                             <h1 className="font-semibold text-lg text-gray-800">
                               {project.project_name}
@@ -190,19 +226,27 @@ function DatatableProjects({ projects, teammembers, users, activities, tasks }) 
                               </span>
                             </div>
                           </div>
-                          <div className="bg-blue-100 w-6 h-6 flex items-center justify-center cursor-pointer rounded-full">
-                            <FaEye
-                              size={18}
-                              className="text-blue-600"
-                              onClick={() =>
-                                history.push("/activityboardlist", {
-                                  projects: project,
-                                  users: users,
-                                  teammembers: teammembers,
-                                  activities: activities,
-                                })
-                              }
-                            />
+                          <div className="flex gap-4 items-center">
+                            <button
+                              className="px-3 py-1  border-2 border-blue-500 text-blue-500 rounded-md font-bold hover:bg-blue-100"
+                              onClick={showModal}
+                            >
+                              Present
+                            </button>
+                            <div className="bg-blue-100 w-6 h-6 flex items-center justify-center cursor-pointer rounded-full">
+                              <FaEye
+                                size={18}
+                                className="text-blue-600"
+                                onClick={() =>
+                                  history.push("/activityboardlist", {
+                                    projects: project,
+                                    users: users,
+                                    teammembers: teammembers,
+                                    activities: activities,
+                                  })
+                                }
+                              />
+                            </div>
                           </div>
                         </div>
                         <Divider />
@@ -239,6 +283,19 @@ function DatatableProjects({ projects, teammembers, users, activities, tasks }) 
           </Carousel>
         </div>
       </section>
+      <Modal
+        title="Powerpoint Presentation"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        className="z-50"
+        width={1200}
+        bodyStyle={{ height: "600px" }}
+      >
+        <div className="custom-modal-body">
+          <Powerpoint />
+        </div>
+      </Modal>
     </div>
   );
 }

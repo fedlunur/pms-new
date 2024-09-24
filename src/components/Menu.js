@@ -6,7 +6,7 @@ import { RiTeamFill } from "react-icons/ri";
 import { ImAttachment } from "react-icons/im";
 import { GrProjects, GrTasks } from "react-icons/gr";
 import { Menu } from "antd";
-import logo from "../images/logopms.png"; // Ensure the path is correct
+import logo from "../images/logoblack.png"; // Ensure the path is correct
 
 const { SubMenu } = Menu;
 
@@ -18,10 +18,10 @@ export default function SideMenu() {
     <div>
       <aside className="bg-white h-full main-sidebar px-2 py-2 w-1/6">
         <div>
-          <div className="w-[90%] h-[80px]">
+          <div className="w-[90%] h-[200px]">
             <img src={logo} alt="logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-xl font-light text-center text-blue-800 mt-2">PMS</h1>
+          {/* <h1 className="text-xl font-light text-center text-blue-800 mt-2">PMS</h1> */}
         </div>
         <Menu
           mode="inline"

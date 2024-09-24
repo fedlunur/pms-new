@@ -1,6 +1,39 @@
+
+.slick-next::after {
+  content: ''; /* Ensure the ::after pseudo-element is rendered */
+  font-size: 30px !important;
+  width: 30px !important;
+  height: 30px !important;
+  color: #000 !important;
+  opacity: 1 !important;
+  display: inline-block; /* Ensures the pseudo-element is displayed properly */
+  top: 0px !important;
+}
+.slick-prev::after {
+  content: ''; /* Ensure the ::after pseudo-element is rendered */
+  font-size: 30px !important;
+  width: 30px !important;
+  height: 30px !important;
+  color: #000 !important;
+  opacity: 1 !important;
+  display: inline-block; /* Ensures the pseudo-element is displayed properly */
+  top: -80px !important;
+}
+
+.slick-dots li button {
+  background-color: #3b3b3b !important; /* Default dot color */
+  border-radius: 10px !important; /* Make the dot round */
+  width: 10px !important; /* Set size of the dots */
+  height: 20px !important;
+  border: none;
+}
+
+.slick-dots li.slick-active button {
+  background-color: #3B82F6 !important; /* Change to black when active */
+}
+
 .custom-carousel .ant-carousel .slick-prev,
 .custom-carousel .ant-carousel .slick-next {
-  top: 20px; /* Adjust this value to position the arrows as needed */
 }
 
 .custom-carousel .ant-carousel .slick-prev {
@@ -9,4 +42,9 @@
 
 .custom-carousel .ant-carousel .slick-next {
   right: 10px; /* Adjust as needed */
+}
+
+.custom-modal-body {
+  height: 600px;
+  overflow-y: hidden; 
 }
